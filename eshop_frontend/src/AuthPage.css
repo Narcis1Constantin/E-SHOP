@@ -1,0 +1,136 @@
+.page-wrapper {
+    width: 100%;
+    min-height: 100vh;
+    background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.auth-container {
+    width: 100%;
+    max-width: 450px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    margin: auto;
+}
+
+.auth-header {
+    background-color: #333;
+    color: white;
+    padding: 20px 30px;
+    text-align: center;
+}
+
+.auth-header h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 700;
+}
+
+.auth-header span { color: #fda085; }
+
+.auth-tabs {
+    display: flex;
+    background: #f0f0f0;
+}
+
+.auth-tabs button {
+    flex: 1;
+    padding: 15px;
+    border: none;
+    background: transparent;
+    font-size: 16px;
+    font-weight: 500;
+    color: #777;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.auth-tabs button.active {
+    border-bottom-color: #fda085;
+    color: #333;
+    background: #fff;
+}
+
+.form-panel { padding: 25px 30px 30px 30px; }
+
+form { display: flex; flex-direction: column; gap: 14px; }
+
+label { font-weight: 500; color: #333; font-size: 14px; }
+
+input {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    background: #f8f8f8;
+}
+
+input:focus { border-color: #fda085; outline: none; background: #fff; }
+
+.submit-btn {
+    margin-top: 10px;
+    padding: 15px;
+    width: 100%;
+    background: linear-gradient(120deg, #333 0%, #555 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.submit-btn:hover { opacity: 0.9; }
+
+.message-area {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 14px;
+    text-align: center;
+}
+
+.message-area.success { background: #e8ffe8; border: 1px solid #b2ffb2; color: #065f06; }
+.message-area.error { background: #ffe6e6; border: 1px solid #ffb3b3; color: #a00; }
+
+/* SUBTAB-URI EMAIL / TELEFON – aliniate cu tab-urile de sus */
+.login-subtabs {
+    display: flex;
+    justify-content: center;
+    gap: 10px;                /* mic spațiu între butoane (oval) */
+    margin: 10px 0 20px 0;
+}
+
+/* Butoane ovale */
+.login-subtabs button {
+    padding: 6px 20px;
+    background: #ffe7df;       /* portocaliu foarte deschis */
+    border: 2px solid #f79d82; /* contur portocaliu */
+    color: #cc6e55;            /* text portocaliu */
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: 0.25s ease;
+    border-radius: 25px;       /* OVALE */
+}
+
+/* Buton activ */
+.login-subtabs button.active {
+    background: #f79d82;       /* portocaliu */
+    color: white;
+    border-color: #f79d82;
+    font-weight: 600;
+}
+
+/* Hover */
+.login-subtabs button:not(.active):hover {
+    background: #ffd3c5;
+    border-color: #f79d82;
+}

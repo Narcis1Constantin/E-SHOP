@@ -1,0 +1,26 @@
+/* src/App.css */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    /* Schimbăm height: 100% în min-height pentru a permite creșterea */
+    min-height: 100vh;
+    background: none;
+    font-family: "Roboto", sans-serif;
+    -webkit-font-smoothing: antialiased;
+
+    /* IMPORTANT: Asta activează scroll-ul vertical */
+    overflow-y: auto;
+    overflow-x: hidden; /* Previne scroll-ul orizontal nedorit */
+}
+
+* {
+    box-sizing: border-box;
+}
+
+#root {
+    width: 100%;
+    min-height: 100vh; /* Se asigură că aplicația ocupă tot ecranul */
+}

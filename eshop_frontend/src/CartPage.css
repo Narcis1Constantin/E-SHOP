@@ -1,0 +1,260 @@
+.cart-page-wrapper {
+    padding: 30px;
+    max-width: 1300px;
+    margin: 0 auto;
+    font-family: "Roboto", sans-serif;
+    min-height: 100vh;
+    background: #f8f8f8;
+}
+
+h1 { margin-bottom: 20px; color: #333; }
+
+.cart-layout {
+    display: flex;
+    gap: 30px;
+}
+
+.cart-left-section { flex: 2; display: flex; flex-direction: column; gap: 20px; }
+.cart-right-section { flex: 1; }
+
+.section-box {
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.section-box h3 {
+    margin-top: 0;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+}
+
+/* --- LISTA PRODUSE --- */
+.cart-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 0;
+    border-bottom: 1px solid #f9f9f9;
+}
+.cart-thumb { width: 60px; height: 60px; object-fit: contain; }
+.cart-details h4 { margin: 0; font-size: 15px; }
+.quantity-controls { display: flex; gap: 5px; }
+.quantity-controls button { width: 25px; height: 25px; }
+.remove-btn { color: #cf002f; background: none; border: none; cursor: pointer; }
+
+/* --- TABS LIVRARE --- */
+.delivery-tabs {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 15px;
+    background: #f0f0f0;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    color: #555;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.tab-btn.active {
+    background: #fff;
+    border-color: #cf002f;
+    color: #cf002f;
+}
+
+.tab-btn:hover { background: #e9e9e9; }
+
+/* --- FORMULAR ADRESA --- */
+.form-row { display: flex; gap: 15px; margin-bottom: 15px; }
+input, textarea {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+}
+input:focus, textarea:focus { border-color: #cf002f; outline: none; }
+
+/* --- EASYBOX & HARTA --- */
+.city-search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.city-search-row input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.city-search-row button {
+    padding: 10px 20px;
+    background: #333;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.map-wrapper {
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.selected-locker-info {
+    padding: 15px;
+    border-radius: 6px;
+    font-size: 14px;
+    text-align: center;
+}
+.selected-locker-info.success {
+    background: #e8ffe8;
+    color: #2e7d32;
+    border: 1px solid #b2ffb2;
+}
+.selected-locker-info.warning {
+    background: #fff3e0;
+    color: #ef6c00;
+    border: 1px solid #ffe0b2;
+}
+
+/* --- SUMMARY DREAPTA --- */
+.cart-summary {
+    background: #fff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.sticky-summary { position: sticky; top: 100px; }
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    font-size: 14px;
+    color: #555;
+}
+.summary-row.total {
+    font-size: 18px;
+    font-weight: bold;
+    color: #000;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid #eee;
+}
+
+.checkout-btn {
+    width: 100%;
+    padding: 15px;
+    background: #cf002f;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    margin-top: 20px;
+    cursor: pointer;
+}
+.checkout-btn:disabled { background: #ccc; cursor: not-allowed; }
+
+.animate-fade {
+    animation: fadeIn 0.4s ease;
+}
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+    .cart-layout { flex-direction: column; }
+    .form-row { flex-direction: column; }
+}
+
+
+/* =========================================
+   DESIGN PENTRU COȘ GOL (NOU)
+   ========================================= */
+.cart-page-wrapper.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 80vh;
+    background: #f8f8f8;
+}
+
+.empty-cart-box {
+    background: white;
+    padding: 50px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    max-width: 500px;
+    width: 90%;
+    animation: fadeIn 0.5s ease;
+}
+
+.empty-icon-circle {
+    width: 100px;
+    height: 100px;
+    background: #fff0f0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 25px auto;
+}
+
+.empty-icon-circle i {
+    font-size: 40px;
+    color: #cf002f;
+}
+
+.empty-cart-box h2 {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 10px;
+    font-weight: 800;
+}
+
+.empty-cart-box p {
+    color: #777;
+    margin-bottom: 30px;
+    line-height: 1.5;
+}
+
+.return-shop-btn {
+    background: #cf002f;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 30px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 15px rgba(207, 0, 47, 0.3);
+}
+
+.return-shop-btn:hover {
+    background: #a80026;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(207, 0, 47, 0.4);
+}

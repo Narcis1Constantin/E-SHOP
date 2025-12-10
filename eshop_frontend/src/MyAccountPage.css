@@ -1,0 +1,277 @@
+/* === BACKGROUND GENERAL === */
+.myaccount-wrapper {
+    display: flex;
+    gap: 30px;
+    width: 100%;
+    min-height: 100vh;
+    padding: 40px;
+    background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+    box-sizing: border-box;
+}
+
+
+/* === SIDEBAR === */
+.myaccount-sidebar {
+    width: 260px;
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 14px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
+
+.myaccount-sidebar div {
+    padding: 12px 12px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    color: #333;
+    transition: 0.25s ease;
+}
+
+.myaccount-sidebar div:hover {
+    background: #f5f5f5;
+}
+
+.active-tab {
+    background: #ffe0d1;
+    border-left: 4px solid #fda085;
+    padding-left: 8px;
+}
+
+.logout-tab {
+    color: #c40000;
+    margin-top: 20px;
+    font-weight: 700;
+}
+
+
+/* === CONTENT (PARTEA DIN DREAPTA) === */
+.myaccount-content {
+    flex: 1;
+    background: #ffffff;
+    border-radius: 14px;
+    padding: 40px;
+    box-shadow: 0 5px 30px rgba(0,0,0,0.15);
+}
+
+/* TITLU SECTIUNE */
+.section-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 25px;
+}
+
+/* === FORMULAR === */
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+label {
+    font-weight: 600;
+    color: #333;
+}
+
+input {
+    width: 100%;
+    padding: 12px;
+    background: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    color: #333;
+    transition: 0.25s;
+}
+
+input:focus {
+    border-color: #fda085;
+    background: white;
+    outline: none;
+}
+
+.submit-btn {
+    padding: 14px;
+    margin-top: 10px;
+    background: linear-gradient(120deg, #333 0%, #555 100%);
+    border: none;
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 16px;
+    transition: 0.2s ease;
+}
+
+.submit-btn:hover {
+    opacity: 0.9;
+}
+
+
+/* === MESAJE === */
+.message-area {
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 20px;
+}
+
+.message-area.success {
+    background: #e8ffe8;
+    border: 1px solid #b2ffb2;
+    color: #065f06;
+}
+
+.message-area.error {
+    background: #ffe7e7;
+    border: 1px solid #ffb3b3;
+    color: #a40000;
+}
+
+
+/* === LISTA DE COMENZI === */
+.orders-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.order-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    border-left: 5px solid #fda085;
+}
+
+.order-title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.order-info {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.no-orders {
+    padding: 20px;
+    background: #fff5f0;
+    border-left: 4px solid #ff9d7d;
+    font-weight: 600;
+    color: #663300;
+    border-radius: 8px;
+}
+
+/* Rand Formular: label + input pe aceeași linie */
+.account-form .form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 18px;
+    gap: 20px;
+}
+
+/* Label-ul îngust */
+.account-form label {
+    width: 150px;
+    font-weight: 600;
+    color: #333;
+}
+
+/* Input-ul lat */
+.account-form input {
+    flex: 1;
+    padding: 12px;
+    background: #f7f7f7;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+}
+
+.account-form input:focus {
+    border-color: #fda085;
+    background: #ffffff;
+    outline: none;
+}
+
+/* Buton */
+.account-form .submit-btn {
+    width: 100%;
+    margin-top: 15px;
+    padding: 14px;
+    background: linear-gradient(120deg, #333, #555);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.account-form .submit-btn:hover {
+    opacity: 0.9;
+}
+/* ===== HEADER BLACK BAND ===== */
+.reset-header {
+    width: 100%;
+    background: #333;
+    padding: 25px 0;
+    border-radius: 20px 20px 0 0;
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.reset-header h1 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 800;
+    color: white;
+}
+
+/* ===== FORM LIKE PROFILE ===== */
+.account-reset-wrapper .account-form {
+    padding: 20px;
+}
+
+.account-reset-wrapper .form-row {
+    margin-bottom: 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.account-reset-wrapper label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.account-reset-wrapper input {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    background: #f8f8f8;
+    transition: 0.3s;
+}
+
+.account-reset-wrapper input:focus {
+    border-color: #fda085;
+    background: #fff;
+    outline: none;
+}
+
+/* Submit button */
+.account-reset-wrapper .submit-btn {
+    width: 100%;
+    padding: 15px;
+    margin-top: 10px;
+    background: linear-gradient(120deg, #333 0%, #555 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+}

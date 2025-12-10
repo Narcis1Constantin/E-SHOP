@@ -1,0 +1,46 @@
+### REGISTER
+POST http://localhost:3001/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test User",
+  "email": "test@test.ro",
+  "phone": "+40722110000",
+  "address": "Strada Exemplu 10, Bucuresti",
+  "password": "parola123"
+}
+
+### LOGIN (email)
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@test.ro",
+  "password": "parola123"
+}
+
+### LOGIN (telefon)
+POST http://localhost:3001/api/auth/login
+Content-Type: application/json
+
+{
+  "phone": "+40722110000",
+  "password": "parola123"
+}
+
+### PRODUCTS
+GET http://localhost:3001/api/products
+
+### ADD TO CART
+POST http://localhost:3001/api/cart/items
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYyOTc1MDc3LCJleHAiOjE3NjM1Nzk4Nzd9.Sduniu00Yqq0QEw9gZYEMFy_wGYxMEOgkCFVHVhPvFY
+Content-Type: application/json
+
+{
+  "productId": 1,
+  "qty": 2
+}
+
+### GET CART
+GET http://localhost:3001/api/cart
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOjEsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzYyOTc1MDc3LCJleHAiOjE3NjM1Nzk4Nzd9.Sduniu00Yqq0QEw9gZYEMFy_wGYxMEOgkCFVHVhPvFY
