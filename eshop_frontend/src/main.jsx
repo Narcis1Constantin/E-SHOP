@@ -5,17 +5,19 @@ import { BrowserRouter } from 'react-router-dom'
 import './index.css'
 import App from './App.jsx'
 import { CartProvider } from './CartContext.jsx'
+import { UserProvider } from './UserContext.jsx'
 
-// --- IMPORT NOU PENTRU HARTĂ ---
+// --- IMPORT PENTRU HARTĂ ---
 import 'leaflet/dist/leaflet.css';
-// ------------------------------
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <BrowserRouter>
-            <CartProvider>
-                <App />
-            </CartProvider>
+            <UserProvider>
+                <CartProvider>
+                    <App />
+                </CartProvider>
+            </UserProvider>
         </BrowserRouter>
     </StrictMode>
 )

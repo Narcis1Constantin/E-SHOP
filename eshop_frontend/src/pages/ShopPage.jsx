@@ -1,14 +1,13 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
-// IMPORTURILE TALE (cu ../ pentru a ieși din folderul pages)
 import { useCart } from "../CartContext";
+import { useUser } from "../UserContext";
 import "../ShopPage.css";
 
 export default function ShopPage({ onLogout }) {
     const navigate = useNavigate();
     const { addToCart, cartCount } = useCart();
-
-    const [user, setUser] = useState(null);
+    const { user, isAdmin } = useUser();
 
     // State pentru produse
     const [allProducts, setAllProducts] = useState([]);
@@ -26,93 +25,39 @@ export default function ShopPage({ onLogout }) {
 
     // Calculăm categoriile unice
     const uniqueCategories = useMemo(() => {
-        const cats = allProducts.map(p => p.category);
+        const cats = allProducts.map(p => p.category).filter(c => c);
         return ["Toate", ...new Set(cats)];
     }, [allProducts]);
 
-    // 1. Fetch User (pentru Header)
+    // Fetch produse din BAZA TA DE DATE
     useEffect(() => {
-        const fetchUser = async () => {
-            const token = localStorage.getItem("authToken");
-            if (!token) return;
-            try {
-                const res = await fetch("http://localhost:3002/api/account/me", {
-                    method: "GET",
-                    headers: { "Authorization": `Bearer ${token}` }
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    setUser(data);
-                }
-            } catch (err) {
-                console.error("Eroare fetch user:", err);
-            }
-        };
-        fetchUser();
-    }, []);
-
-    // 2. Fetch & GENERARE MASIVĂ DE PRODUSE
-    useEffect(() => {
-        const fetchAndGenerateProducts = async () => {
+        const fetchProducts = async () => {
             try {
                 setLoading(true);
-                // Luăm produsele de bază de la API
-                const res = await fetch('https://dummyjson.com/products?limit=0');
-                if (!res.ok) throw new Error("Eroare server produse.");
-                const data = await res.json();
+                const token = localStorage.getItem('authToken');
 
-                if (!data || !data.products) {
-                    setAllProducts([]);
-                    setDisplayedProducts([]);
-                    setLoading(false);
-                    return;
-                }
+                // Luăm produsele din backend-ul tău
+                const res = await fetch('http://localhost:3002/api/products', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
 
-                // Filtrăm doar categoriile tech/electro
-                const electronics = data.products.filter(p =>
-                    ['laptops', 'smartphones', 'tablets', 'mobile-accessories', 'mens-watches'].includes(p.category)
-                );
+                if (!res.ok) throw new Error("Eroare la încărcarea produselor.");
 
-                // Fallback: dacă nu sunt destule electronice, folosim tot ce avem
-                const baseProducts = electronics.length > 0 ? electronics : data.products;
+                const products = await res.json();
 
-                // --- LOGICA DE MULTIPLICARE (SUTE DE PRODUSE) ---
-                const TOTAL_TARGET = 1200; // Vrem 1200 produse în total
-                const finalProducts = [];
-
-                for (let i = 0; i < TOTAL_TARGET; i++) {
-                    // Alegem un produs "template" prin rotație
-                    const template = baseProducts[i % baseProducts.length];
-
-                    // Generăm logică random pentru reduceri (30% șanse)
-                    const hasDiscount = Math.random() > 0.7;
-                    const discountValue = hasDiscount ? Math.floor(Math.random() * 20) + 5 : 0;
-
-                    // Creăm produsul nou unic
-                    finalProducts.push({
-                        ...template,
-                        id: 10000 + i, // ID unic generat (foarte important pentru React keys)
-                        title: `${template.title} (Lot #${i + 1})`,
-                        // Variem puțin prețul pentru realism
-                        price: Math.max(10, template.price + Math.floor(Math.random() * 50 - 20)),
-                        discountPercentage: discountValue,
-                        stock: Math.floor(Math.random() * 100) // Stoc random între 0 și 100
-                    });
-                }
-
-                setAllProducts(finalProducts);
-                setDisplayedProducts(finalProducts);
+                setAllProducts(products);
+                setDisplayedProducts(products);
                 setLoading(false);
             } catch (err) {
                 console.error("Eroare produse:", err);
-                setError("Nu s-au putut genera produsele.");
+                setError("Nu s-au putut încărca produsele.");
                 setLoading(false);
             }
         };
-        fetchAndGenerateProducts();
+        fetchProducts();
     }, []);
 
-    // 3. Logica de Filtrare (se aplică pe lista mare)
+    // Logica de Filtrare
     useEffect(() => {
         if (allProducts.length === 0) return;
         let result = allProducts;
@@ -125,10 +70,11 @@ export default function ShopPage({ onLogout }) {
             result = result.filter(p => p.category === selectedCategory);
         }
 
+        // Convertim price din lei în comparație corectă
         result = result.filter(p => p.price >= priceRange.min && p.price <= priceRange.max);
 
         if (onlyDiscount) {
-            result = result.filter(p => p.discountPercentage > 0);
+            result = result.filter(p => p.discountPercentage && p.discountPercentage > 0);
         }
         if (onlyInStock) {
             result = result.filter(p => p.stock > 0);
@@ -148,7 +94,7 @@ export default function ShopPage({ onLogout }) {
                 <div className="header-top">
                     <div className="header-content-width">
                         <div className="logo-section">
-                            <h1 className="shop-logo">e<span>-shop</span></h1>
+                            <h1 className="shop-logo">Smart<span>Depot</span></h1>
                         </div>
 
                         <div className="search-bar-container">
@@ -182,6 +128,14 @@ export default function ShopPage({ onLogout }) {
                                         <div className="menu-item" onClick={() => navigate("/my-account")}>
                                             <i className="fas fa-id-card"></i> Date personale
                                         </div>
+
+                                        {/* BUTON ADMIN - vizibil doar pentru admini */}
+                                        {isAdmin && (
+                                            <div className="menu-item admin-link" onClick={() => navigate("/admin")}>
+                                                <i className="fas fa-cog"></i> Panou Administrator
+                                            </div>
+                                        )}
+
                                         <div className="menu-item" onClick={onLogout}>
                                             <i className="fas fa-sign-out-alt"></i> Deconectare
                                         </div>
@@ -241,7 +195,7 @@ export default function ShopPage({ onLogout }) {
                         <label>Categorie</label>
                         <select value={selectedCategory} onChange={(e) => setSelectedCategory(e.target.value)}>
                             {uniqueCategories.map(cat => (
-                                <option key={cat} value={cat}>{cat.toUpperCase()}</option>
+                                <option key={cat} value={cat}>{cat ? cat.toUpperCase() : 'NECATEGORIZAT'}</option>
                             ))}
                         </select>
                     </div>
@@ -297,18 +251,48 @@ export default function ShopPage({ onLogout }) {
 
                 <div className="products-grid">
                     {displayedProducts.map((product) => (
-                        <div key={product.id} className="product-card">
-                            <div className="image-container">
-                                <img loading="lazy" src={product.thumbnail} alt={product.title} />
+                        <div
+                            key={product.id}
+                            className="product-card"
+                            style={{ cursor: 'pointer' }}
+                        >
+                            {/* Imaginea duce la pagina de detalii */}
+                            <div
+                                className="image-container"
+                                onClick={() => navigate(`/product/${product.id}`)}
+                            >
+                                <img
+                                    loading="lazy"
+                                    src={product.imageUrl || 'https://via.placeholder.com/300x300?text=Fara+imagine'}
+                                    alt={product.title}
+                                    onError={(e) => {
+                                        e.target.src = 'https://via.placeholder.com/300x300?text=Fara+imagine';
+                                    }}
+                                />
                                 {product.discountPercentage > 0 && (
                                     <span className="discount-badge">-{Math.round(product.discountPercentage)}%</span>
                                 )}
                             </div>
-                            <div className="product-info">
+
+                            {/* Info produs - și asta duce la detalii */}
+                            <div
+                                className="product-info"
+                                onClick={() => navigate(`/product/${product.id}`)}
+                            >
                                 <h3>{product.title}</h3>
                                 <div className="price-row">
                                     <span className="price">{Number(product.price).toFixed(2)} Lei</span>
-                                    <button className="add-cart-btn" onClick={() => addToCart(product)}>Adaugă</button>
+                                    <button
+                                        className="add-cart-btn"
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // IMPORTANT: oprește propagarea
+                                            addToCart(product);
+                                            alert('Produs adăugat în coș!');
+                                        }}
+                                        disabled={product.stock === 0}
+                                    >
+                                        Adaugă
+                                    </button>
                                 </div>
                                 <span className={`stock-status ${product.stock === 0 ? 'out-of-stock' : ''}`}>
                                     {product.stock > 0 ? "In stoc" : "Stoc epuizat"}

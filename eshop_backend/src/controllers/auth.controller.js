@@ -81,7 +81,7 @@ exports.login = async (req, res) => {
         const token = jwt.sign(
             { uid: user.id, role: user.role },
             process.env.JWT_SECRET,
-            { expiresIn: "7d" }
+            { expiresIn: "3h" } // ← 3 ore
         );
 
         res.json({ token });
@@ -92,39 +92,53 @@ exports.login = async (req, res) => {
     }
 };
 
-exports.resetConfirm = async (req, res) => {
-
-    const { token, email, newPassword } = req.body;
+exports.verifyCode = async (req, res) => {
+    const { email, code } = req.body;
 
     try {
-        //cautam utilizatorul dupa email
         const { rows } = await pool.query(
-            `SELECT id, reset_token_expires FROM users 
+            `SELECT id FROM users
              WHERE email = $1 AND reset_token = $2 AND reset_token_expires > NOW()`,
-            [email, token]
+            [email, code]
         );
 
         if (!rows.length) {
-            return res.status(400).json({ error: "Token invalid sau expirat" });
+            return res.status(400).json({ error: "Cod invalid sau expirat" });
+        }
+
+        res.json({ ok: true, message: "Cod valid" });
+    } catch (err) {
+        console.error("Eroare la verificare cod:", err);
+        res.status(500).json({ error: "Eroare server" });
+    }
+};
+
+exports.resetPassword = async (req, res) => {
+    const { email, code, newPassword } = req.body;
+
+    try {
+        const { rows } = await pool.query(
+            `SELECT id FROM users 
+             WHERE email = $1 AND reset_token = $2 AND reset_token_expires > NOW()`,
+            [email, code]
+        );
+
+        if (!rows.length) {
+            return res.status(400).json({ error: "Cod invalid sau expirat" });
         }
 
         const uid = rows[0].id;
+        const hash = await bcrypt.hash(newPassword, 10);
 
-        // cripteaza parola noua
-        const hash = await bcrypt.hash(newPassword, SALT_ROUNDS);
-
-        // actualizam parola
         const client = await pool.connect();
         try {
             await client.query('BEGIN');
 
-            // Actualizam parola
             await client.query(
                 'UPDATE users SET password_hash = $1 WHERE id = $2',
                 [hash, uid]
             );
 
-            // invalidam tokenul de resetare
             await client.query(
                 'UPDATE users SET reset_token = NULL, reset_token_expires = NULL WHERE id = $1',
                 [uid]
@@ -132,18 +146,16 @@ exports.resetConfirm = async (req, res) => {
 
             await client.query('COMMIT');
 
-            res.json({ ok: true, message: "Parola a fost actualizata" });
-
+            res.json({ ok: true, message: "Parola a fost actualizată" });
         } catch (e) {
             await client.query('ROLLBACK');
             throw e;
         } finally {
             client.release();
         }
-
     } catch (err) {
-        console.error("Eroare la resetConfirm:", err);
-        return res.status(500).json({ error: "Eroare internă de server la resetarea parolei." });
+        console.error("Eroare la resetPassword:", err);
+        res.status(500).json({ error: "Eroare server" });
     }
 };
 
@@ -152,42 +164,39 @@ const crypto = require('crypto');
 exports.resetRequest = async (req, res) => {
     const { email } = req.body;
 
-    //gasim userul
     const { rows } = await pool.query(
         'SELECT id FROM users WHERE email = $1',
         [email]
     );
 
     if (!rows.length) {
+        // Nu dezvăluim dacă emailul există sau nu (securitate)
         return res.json({ ok: true });
     }
 
     const uid = rows[0].id;
 
-    // generam un token Scurt si o dată de expirare - 15 min
-    // folosim crypto pentru a genera un token unic, nu JWT
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const expires = new Date(Date.now() + 15 * 60 * 1000); // acum + 15 minute
+    // Generăm cod de 6 cifre
+    const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 minute
 
-    // stocam token-ul si data de expirare în baza de date
+    // Stocăm codul în DB
     await pool.query(
         'UPDATE users SET reset_token = $1, reset_token_expires = $2 WHERE id = $3',
-        [resetToken, expires, uid]
+        [resetCode, expires, uid]
     );
 
-    // link-ul de resetare
-    const resetLink = `http://localhost:5174/reset-password?token=${resetToken}&email=${email}`;
-
-    // trimitem email
+    // Trimitem email cu codul
     await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: email,
-        subject: "E-SHOP: Resetare parola",
+        subject: "SmartDepot - Cod resetare parolă",
         html: `
             <h3>Resetare Parolă</h3>
-            <p>Click pe link pentru a reseta parola:</p>
-            <a href="${resetLink}">${resetLink}</a>
-            <p>Link-ul expiră în 15 minute.</p>
+            <p>Codul tău de resetare este:</p>
+            <h1 style="font-size: 32px; letter-spacing: 5px; color: #3498db;">${resetCode}</h1>
+            <p>Codul expiră în 15 minute.</p>
+            <p>Dacă nu ai solicitat resetarea, ignoră acest email.</p>
         `
     });
 

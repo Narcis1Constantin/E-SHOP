@@ -13,7 +13,6 @@ class ProductBuilder {
     }
 
     setPriceCents(price_cents) {
-        // convertim cenți în lei (sau ce unitate folosiți)
         this.price = price_cents / 100;
         return this;
     }
@@ -35,6 +34,11 @@ class ProductBuilder {
 
     setImageUrl(image_url) {
         this.imageUrl = image_url;
+        return this;
+    }
+
+    setDescription(description) { // ← NOU
+        this.description = description;
         return this;
     }
 

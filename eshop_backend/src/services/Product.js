@@ -7,6 +7,7 @@ class Product {
         this.brand = builder.brand;
         this.category = builder.category;
         this.imageUrl = builder.imageUrl;
+        this.description = builder.description; // ← NOU
         this.createdAt = builder.createdAt;
     }
 }

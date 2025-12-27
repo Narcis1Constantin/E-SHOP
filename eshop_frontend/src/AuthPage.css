@@ -27,7 +27,10 @@
 
 .auth-header h1 {
     margin: 0;
-    font-size: 28px;
+    font-size: 2rem;
+    text-align: center;
+    padding: 1.5rem 0;
+    color: #ff9966; /* Portocaliu */
     font-weight: 700;
 }
 

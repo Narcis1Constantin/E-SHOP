@@ -38,23 +38,20 @@ r.post(
     ctrl.login
 );
 
-r.post(
-    '/reset-request',
-    [
-        body('email').isEmail().withMessage('Email invalid'),
-    ],
-    ctrl.resetRequest
-);
+r.post('/reset-request', [
+    body('email').isEmail().withMessage('Email invalid'),
+], ctrl.resetRequest);
 
-r.post(
-    '/reset-confirm',
-    [
-        body('token').exists().withMessage('Token lipsă'),
-        body('email').isEmail().withMessage('Email invalid'),
-        body('newPassword').isLength({ min: 6 }).withMessage('Parolă minim 6 caractere'),
-    ],
-    ctrl.resetConfirm
-);
+r.post('/verify-code', [
+    body('email').isEmail().withMessage('Email invalid'),
+    body('code').isLength({ min: 6, max: 6 }).withMessage('Cod invalid'),
+], ctrl.verifyCode);
+
+r.post('/reset-password', [
+    body('email').isEmail().withMessage('Email invalid'),
+    body('code').isLength({ min: 6, max: 6 }).withMessage('Cod invalid'),
+    body('newPassword').isLength({ min: 6 }).withMessage('Parolă minim 6 caractere'),
+], ctrl.resetPassword);
 
 
 module.exports = r;

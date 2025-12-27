@@ -1,5 +1,6 @@
 import React from "react";
 import "../ShopPage.css";
+import { useUser } from "../../UserContext";
 
 export default function ShopPageView({
                                          navigate,
@@ -22,8 +23,11 @@ export default function ShopPageView({
                                          displayedProducts,
                                          loading,
                                          error,
-                                         addToCart, cartCount
+                                         addToCart,
+                                         cartCount
                                      }) {
+    const { isAdmin } = useUser();
+
     return (
         <div className="shop-page-wrapper">
 
@@ -67,6 +71,14 @@ export default function ShopPageView({
                                         <div className="menu-item" onClick={() => navigate("/my-account")}>
                                             <i className="fas fa-id-card"></i> Date personale
                                         </div>
+
+                                        {/* Buton Admin Panel - vizibil doar pentru admini */}
+                                        {isAdmin && (
+                                            <div className="menu-item admin-link" onClick={() => navigate("/admin")}>
+                                                <i className="fas fa-cog"></i> Panou Administrator
+                                            </div>
+                                        )}
+
                                         <div className="menu-item" onClick={onLogout}>
                                             <i className="fas fa-sign-out-alt"></i> Deconectare
                                         </div>
@@ -74,9 +86,12 @@ export default function ShopPageView({
                                 </div>
                             </div>
 
-                            <button className="icon-btn cart-custom">
+                            <button className="icon-btn cart-custom" onClick={() => navigate("/cart")}>
                                 <i className="fas fa-shopping-cart"></i>
                                 <span className="btn-text">Coșul meu</span>
+                                {cartCount > 0 && (
+                                    <span className="cart-badge">{cartCount}</span>
+                                )}
                             </button>
                         </div>
                     </div>
@@ -190,7 +205,7 @@ export default function ShopPageView({
                     {displayedProducts.map((product) => (
                         <div key={product.id} className="product-card">
                             <div className="image-container">
-                                <img loading="lazy" src={product.thumbnail} alt={product.title} />
+                                <img loading="lazy" src={product.imageUrl} alt={product.title} />
                                 {product.discountPercentage > 0 && (
                                     <span className="discount-badge">
                                         -{Math.round(product.discountPercentage)}%
@@ -205,7 +220,13 @@ export default function ShopPageView({
                                     <span className="price">
                                         {Number(product.price).toFixed(2)} lei
                                     </span>
-                                    <button className="add-cart-btn">Adaugă</button>
+                                    <button
+                                        className="add-cart-btn"
+                                        onClick={() => addToCart(product)}
+                                        disabled={product.stock === 0}
+                                    >
+                                        Adaugă
+                                    </button>
                                 </div>
 
                                 <span className={`stock-status ${product.stock === 0 ? 'out-of-stock' : ''}`}>
