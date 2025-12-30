@@ -26,6 +26,21 @@ export default function AuthPageView({
                                          handleSetNewPassword,
                                      }) {
 
+    // ✅ Funcție îmbunătățită pentru detectarea erorilor legate de parolă
+    const isPasswordError = (text) => {
+        if (!text) return false;
+
+        const lowerText = text.toLowerCase();
+
+        const passwordKeywords = [
+            'parol', 'password', 'parola', 'parolă',
+            'autentificare', 'authentication', 'credentiale',
+            'incorect', 'incorrect', 'gresit', 'greșit'
+        ];
+
+        return passwordKeywords.some(keyword => lowerText.includes(keyword));
+    };
+
     return (
         <div className="page-wrapper">
             <div className="auth-container">
@@ -38,7 +53,7 @@ export default function AuthPageView({
                         className={activeTab === "login" ? "active" : ""}
                         onClick={() => {
                             setActiveTab("login");
-                            clearMessage();
+                            clearMessage(); // Șterge mesajul când schimbăm tab-ul
                         }}
                         id="tab-login"
                     >
@@ -48,7 +63,7 @@ export default function AuthPageView({
                         className={activeTab === "register" ? "active" : ""}
                         onClick={() => {
                             setActiveTab("register");
-                            clearMessage();
+                            clearMessage(); // Șterge mesajul când schimbăm tab-ul
                         }}
                         id="tab-register"
                     >
@@ -66,7 +81,10 @@ export default function AuthPageView({
                                 <button
                                     type="button"
                                     className={loginData.type === "email" ? "active" : ""}
-                                    onClick={() => setLoginData({ ...loginData, type: "email", phone: "" })}
+                                    onClick={() => {
+                                        setLoginData({ ...loginData, type: "email", phone: "" });
+                                        clearMessage();
+                                    }}
                                 >
                                     Email
                                 </button>
@@ -74,7 +92,10 @@ export default function AuthPageView({
                                 <button
                                     type="button"
                                     className={loginData.type === "phone" ? "active" : ""}
-                                    onClick={() => setLoginData({ ...loginData, type: "phone", email: "" })}
+                                    onClick={() => {
+                                        setLoginData({ ...loginData, type: "phone", email: "" });
+                                        clearMessage();
+                                    }}
                                 >
                                     Telefon
                                 </button>
@@ -114,7 +135,7 @@ export default function AuthPageView({
                                 </>
                             )}
 
-                            {/* PAROLA - DOAR DUPĂ SELECTARE */}
+                            {/* PAROLA */}
                             {loginData.type && (
                                 <>
                                     <label htmlFor="log-password">Parolă</label>
@@ -128,25 +149,27 @@ export default function AuthPageView({
                                             onChange={(e) =>
                                                 setLoginData({ ...loginData, password: e.target.value })
                                             }
-                                            style={{ paddingRight: "3rem" }}
+                                            style={{ paddingRight: "45px" }}
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            style={{
-                                                position: "absolute",
-                                                right: "10px",
-                                                top: "50%",
-                                                transform: "translateY(-50%)",
-                                                background: "none",
-                                                border: "none",
-                                                cursor: "pointer",
-                                                fontSize: "1.2rem",
-                                                color: "#666",
-                                                padding: "0.5rem"
-                                            }}
+                                            className="password-toggle-btn"
+                                            title={showPassword ? "Ascunde parola" : "Arată parola"}
                                         >
-                                            {showPassword ? "🙈" : "👁️"}
+                                            {showPassword ? (
+                                                // Icon pentru "ascunde parola" (ochi cu linie)
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                                </svg>
+                                            ) : (
+                                                // Icon pentru "arată parola" (ochi deschis)
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                            )}
                                         </button>
                                     </div>
                                 </>
@@ -214,19 +237,42 @@ export default function AuthPageView({
                             />
 
                             <label htmlFor="reg-password">Parolă</label>
-                            <input
-                                id="reg-password"
-                                name="password"
-                                type="password"
-                                placeholder="Minim 6 caractere"
-                                value={registerData.password}
-                                onChange={(e) =>
-                                    setRegisterData({
-                                        ...registerData,
-                                        password: e.target.value,
-                                    })
-                                }
-                            />
+                            <div style={{ position: "relative" }}>
+                                <input
+                                    id="reg-password"
+                                    name="password"
+                                    type={showPassword ? "text" : "password"}
+                                    placeholder="Minim 6 caractere"
+                                    value={registerData.password}
+                                    onChange={(e) =>
+                                        setRegisterData({
+                                            ...registerData,
+                                            password: e.target.value,
+                                        })
+                                    }
+                                    style={{ paddingRight: "45px" }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className="password-toggle-btn"
+                                    title={showPassword ? "Ascunde parola" : "Arată parola"}
+                                >
+                                    {showPassword ? (
+                                        // Icon pentru "ascunde parola" (ochi cu linie)
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                            <line x1="1" y1="1" x2="23" y2="23"></line>
+                                        </svg>
+                                    ) : (
+                                        // Icon pentru "arată parola" (ochi deschis)
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                    )}
+                                </button>
+                            </div>
 
                             <button type="submit" className="submit-btn">
                                 Creează Cont
@@ -240,7 +286,7 @@ export default function AuthPageView({
                             {/* STEP 1: Introduce email */}
                             {resetStep === 1 && (
                                 <form id="reset-form-step1" onSubmit={handleResetSubmit}>
-                                    <h3 style={{ marginTop: 0, color: "#333" }}>Resetare Parolă - Pas 1</h3>
+                                    <h3>Resetare Parolă</h3>
                                     <p style={{ fontSize: "0.9rem", color: "#666" }}>
                                         Introdu adresa de email și vei primi un cod de verificare.
                                     </p>
@@ -266,7 +312,7 @@ export default function AuthPageView({
                             {/* STEP 2: Introduce cod de 6 cifre */}
                             {resetStep === 2 && (
                                 <form id="reset-form-step2" onSubmit={handleVerifyCode}>
-                                    <h3 style={{ marginTop: 0, color: "#333" }}>Resetare Parolă - Pas 2</h3>
+                                    <h3 style={{ marginTop: 0, color: "#333" }}>Resetare Parolă</h3>
                                     <p style={{ fontSize: "0.9rem", color: "#666" }}>
                                         Introdu codul de 6 cifre primit pe email.
                                     </p>
@@ -325,37 +371,58 @@ export default function AuthPageView({
                                             value={newPassword}
                                             onChange={(e) => setNewPassword(e.target.value)}
                                             required
-                                            style={{ paddingRight: "3rem" }}
+                                            style={{ paddingRight: "45px" }}
                                         />
                                         <button
                                             type="button"
                                             onClick={() => setShowPassword(!showPassword)}
-                                            style={{
-                                                position: "absolute",
-                                                right: "10px",
-                                                top: "50%",
-                                                transform: "translateY(-50%)",
-                                                background: "none",
-                                                border: "none",
-                                                cursor: "pointer",
-                                                fontSize: "1.2rem",
-                                                color: "#666",
-                                                padding: "0.5rem"
-                                            }}
+                                            className="password-toggle-btn"
+                                            title={showPassword ? "Ascunde parola" : "Arată parola"}
                                         >
-                                            {showPassword ? "🙈" : "👁️"}
+                                            {showPassword ? (
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                                </svg>
+                                            ) : (
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                            )}
                                         </button>
                                     </div>
 
                                     <label htmlFor="confirm-password">Confirmă parola</label>
-                                    <input
-                                        id="confirm-password"
-                                        type={showPassword ? "text" : "password"}
-                                        placeholder="Repetă parola"
-                                        value={confirmPassword}
-                                        onChange={(e) => setConfirmPassword(e.target.value)}
-                                        required
-                                    />
+                                    <div style={{ position: "relative" }}>
+                                        <input
+                                            id="confirm-password"
+                                            type={showPassword ? "text" : "password"}
+                                            placeholder="Repetă parola"
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            required
+                                            style={{ paddingRight: "45px" }}
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                            className="password-toggle-btn"
+                                            title={showPassword ? "Ascunde parola" : "Arată parola"}
+                                        >
+                                            {showPassword ? (
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                                </svg>
+                                            ) : (
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                            )}
+                                        </button>
+                                    </div>
 
                                     <button type="submit" className="submit-btn">
                                         Resetează parola
@@ -380,34 +447,38 @@ export default function AuthPageView({
                         </>
                     )}
 
+                    {/* MESAJE AUTH - Design elegant */}
                     {message.text && (
-                        <div className={`message-area ${
-                            message.type === "error"
-                                ? "error"
-                                : message.type === "success"
-                                    ? "success"
-                                    : ""
-                        }`}>
-                            {message.text}
-
-                            {message.type === "error" && message.text.toLowerCase().includes("parol") && (
-                                <div
-                                    onClick={() => {
-                                        setActiveTab("reset");
-                                        setResetStep(1);
-                                        clearMessage();
-                                    }}
-                                    style={{
-                                        marginTop: "8px",
-                                        fontSize: "13px",
-                                        color: "#007bff",
-                                        cursor: "pointer",
-                                        textDecoration: "underline"
-                                    }}
-                                >
-                                    Actualizează parola
+                        <div className="auth-message-wrapper">
+                            <div
+                                className={`auth-message-area ${
+                                    message.type === "error"
+                                        ? "auth-error"
+                                        : message.type === "success"
+                                            ? "auth-success"
+                                            : ""
+                                }`}
+                            >
+                                <div className="auth-message-text">
+                                    {message.text}
                                 </div>
-                            )}
+
+                                {/* Link resetare parolă - DOAR pentru erori de parolă în LOGIN */}
+                                {message.type === "error" &&
+                                    activeTab === "login" &&
+                                    isPasswordError(message.text) && (
+                                        <div
+                                            className="auth-reset-password-link"
+                                            onClick={() => {
+                                                setActiveTab("reset");
+                                                setResetStep(1);
+                                                clearMessage();
+                                            }}
+                                        >
+                                            🔑 Ai uitat parola?
+                                        </div>
+                                    )}
+                            </div>
                         </div>
                     )}
 

@@ -61,7 +61,7 @@ export default function MyAccountPageView({
             <div className="myaccount-content">
                 {activeTab === "profile" && <AccountProfile user={user} setUser={setUser} message={message} handleUpdateSubmit={handleUpdateSubmit} />}
                 {activeTab === "orders" && <AccountOrders orders={orders} />}
-                {activeTab === "premium" && <AccountPremium />}
+                {activeTab === "premium" && <AccountPremium user={user} />}
                 {activeTab === "reset" && (
                     <AccountResetPassword
                         newPassword={newPassword}

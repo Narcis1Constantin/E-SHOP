@@ -3,7 +3,6 @@ const pool = require('../db/pool');
 // GET /api/account/me - returnează datele user-ului curent
 exports.getMe = async (req, res) => {
     try {
-        // req.user vine din middleware-ul requireAuth (contine { uid, role })
         const { uid } = req.user;
 
         const { rows } = await pool.query(
@@ -17,8 +16,23 @@ exports.getMe = async (req, res) => {
             return res.status(404).json({ error: 'Utilizator negăsit' });
         }
 
-        // Nu trimitem password_hash, reset_token, etc.
-        res.json({ user: rows[0] });
+        // ✅ FIX: Calculează totalul cheltuit DOAR din comenzi cu status 'placed'
+        // Exclude comenzile anulate, returnate, sau orice alt status
+        const { rows: orderTotal } = await pool.query(
+            `SELECT COALESCE(SUM(total_cents), 0) as total_spent_cents
+             FROM orders
+             WHERE user_id = $1 
+             AND TRIM(status) = 'placed'`,
+            [uid]
+        );
+
+        const user = rows[0];
+        user.total_spent = orderTotal[0].total_spent_cents / 100; // în lei
+        user.points = Math.floor(user.total_spent); // 1 leu = 1 punct
+
+        console.log(`[Account] User ${uid} - Total spent: ${user.total_spent} lei, Points: ${user.points}`);
+
+        res.json({ user });
     } catch (err) {
         console.error('Eroare la getMe:', err);
         res.status(500).json({ error: 'Eroare internă' });
@@ -29,8 +43,24 @@ exports.getMe = async (req, res) => {
 exports.updateMe = async (req, res) => {
     try {
         const { uid } = req.user;
-        const { name, phone, address } = req.body;
+        const { name, phone, address, password } = req.body;
 
+        // Dacă se schimbă parola
+        if (password) {
+            const bcrypt = require('bcrypt');
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            await pool.query(
+                `UPDATE users 
+                 SET password_hash = $2
+                 WHERE id = $1`,
+                [uid, hashedPassword]
+            );
+
+            return res.json({ ok: true, message: 'Parola a fost schimbată cu succes!' });
+        }
+
+        // Altfel, actualizează profilul
         const { rows } = await pool.query(
             `UPDATE users 
              SET name = COALESCE($2, name),

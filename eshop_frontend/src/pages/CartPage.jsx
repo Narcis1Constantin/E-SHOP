@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import "../CartPage.css";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
@@ -123,228 +124,271 @@ export default function CartPage() {
     // === 5. RANDARE ===
     if (cartItems.length === 0) {
         return (
-            <div className="cart-page-wrapper empty-state">
-                <div className="empty-cart-box">
-                    <div className="empty-icon-circle">
-                        <i className="fas fa-shopping-basket"></i>
+            <>
+                <div className="cart-header">
+                    <div className="cart-header-content">
+                        <h1 className="cart-logo">Smart<span>Depot</span></h1>
+                        <h2 className="cart-page-title">Finalizare Comandă</h2>
+                        <div className="cart-header-spacer"></div>
                     </div>
-                    <h2>Coșul tău este gol</h2>
-                    <p>Nu ai adăugat încă niciun produs în coșul de cumpărături.</p>
-                    <button className="return-shop-btn" onClick={() => navigate("/")}>
-                        Înapoi la Magazin
-                    </button>
                 </div>
-            </div>
+                <div className="cart-page-wrapper empty-state">
+                    <div className="empty-cart-box">
+                        <div className="empty-icon-circle">
+                            <i className="fas fa-shopping-basket"></i>
+                        </div>
+                        <h2>Coșul tău este gol</h2>
+                        <p>Nu ai adăugat încă niciun produs în coșul de cumpărături.</p>
+                        <button className="return-shop-btn" onClick={() => navigate("/")}>
+                            Înapoi la Magazin
+                        </button>
+                    </div>
+                </div>
+            </>
         );
     }
 
     return (
-        <div className="cart-page-wrapper">
-            <h1>Finalizare Comandă</h1>
-            <div className="cart-layout">
+        <>
+            <div className="cart-header">
+                <div className="cart-header-content">
+                    <h1 className="cart-logo">Smart<span>Depot</span></h1>
+                    <h2 className="cart-page-title">Finalizare Comandă</h2>
+                    <div className="cart-header-spacer"></div>
+                </div>
+            </div>
+            <div className="cart-page-wrapper">
+                <div className="cart-layout">
 
-                {/* --- SECȚIUNEA STÂNGĂ (Produse + Formular) --- */}
-                <div className="cart-left-section">
+                    {/* --- SECȚIUNEA STÂNGĂ (Produse + Formular) --- */}
+                    <div className="cart-left-section">
 
-                    {/* LISTA PRODUSE */}
-                    <div className="section-box cart-items-box">
-                        <h3>Produse</h3>
-                        {cartItems.map(item => (
-                            <div key={item.id} className="cart-item">
-                                <div className="cart-details">
-                                    <h4>{item.title}</h4>
-                                    <p>{item.price} Lei</p>
+                        {/* LISTA PRODUSE */}
+                        <div className="section-box cart-items-box">
+                            <h3>Produse</h3>
+                            {cartItems.map(item => (
+                                <div key={item.id} className="cart-item">
+                                    <div className="cart-details">
+                                        <h4>{item.title}</h4>
+                                        <p>{item.price} Lei</p>
+                                    </div>
+                                    <div className="quantity-controls">
+                                        <button onClick={()=>updateQuantity(item.id, -1)}>-</button>
+                                        <span>{item.quantity}</span>
+                                        <button onClick={()=>updateQuantity(item.id, 1)}>+</button>
+                                    </div>
+                                    <div className="item-total">
+                                        {(item.price * item.quantity).toFixed(2)} Lei
+                                    </div>
+                                    <button className="remove-btn" onClick={()=>removeFromCart(item.id)}>
+                                        <i className="fas fa-trash"></i>
+                                    </button>
                                 </div>
-                                <div className="quantity-controls">
-                                    <button onClick={()=>updateQuantity(item.id, -1)}>-</button>
-                                    <span>{item.quantity}</span>
-                                    <button onClick={()=>updateQuantity(item.id, 1)}>+</button>
-                                </div>
-                                <div className="item-total">
-                                    {(item.price * item.quantity).toFixed(2)} Lei
-                                </div>
-                                <button className="remove-btn" onClick={()=>removeFromCart(item.id)}>
-                                    <i className="fas fa-trash"></i>
+                            ))}
+                        </div>
+
+                        {/* FORMULAR LIVRARE & PLATĂ */}
+                        <div className="section-box delivery-box">
+                            <h3>Livrare</h3>
+
+                            {/* Email Confirmare - Full Width */}
+                            <div className="form-group">
+                                <label>Email</label>
+                                <input
+                                    type="email"
+                                    placeholder="email@exemplu.com"
+                                    value={userData.email}
+                                    onChange={e=>setUserData({...userData, email:e.target.value})}
+                                />
+                            </div>
+
+                            {/* Tabs Metodă Livrare */}
+                            <div className="delivery-tabs">
+                                <button
+                                    className={`tab-btn ${deliveryMethod==="home"?"active":""}`}
+                                    onClick={()=>setDeliveryMethod("home")}
+                                >
+                                    <i className="fas fa-truck"></i> Curier
+                                </button>
+                                <button
+                                    className={`tab-btn ${deliveryMethod==="easybox"?"active":""}`}
+                                    onClick={()=>setDeliveryMethod("easybox")}
+                                >
+                                    <i className="fas fa-box"></i> Easybox
                                 </button>
                             </div>
-                        ))}
-                    </div>
 
-                    {/* FORMULAR LIVRARE & PLATĂ */}
-                    <div className="section-box delivery-box">
-                        <h3>Livrare</h3>
+                            {/* Conținut Tab-uri */}
+                            {deliveryMethod === "home" ? (
+                                <div className="address-form animate-fade">
+                                    <div className="form-group">
+                                        <label>Nume</label>
+                                        <input type="text" placeholder="Nume" value={userData.nume} onChange={e=>setUserData({...userData, nume:e.target.value})} />
+                                    </div>
 
-                        {/* Email Confirmare */}
-                        <div className="form-row">
-                            <input
-                                type="email"
-                                placeholder="Email confirmare *"
-                                value={userData.email}
-                                onChange={e=>setUserData({...userData, email:e.target.value})}
-                                style={{width:'100%'}}
-                            />
-                        </div>
+                                    <div className="form-group">
+                                        <label>Telefon</label>
+                                        <input type="text" placeholder="Telefon" value={userData.telefon} onChange={e=>setUserData({...userData, telefon:e.target.value})} />
+                                    </div>
 
-                        {/* Tabs Metodă Livrare */}
-                        <div className="delivery-tabs">
-                            <button
-                                className={`tab-btn ${deliveryMethod==="home"?"active":""}`}
-                                onClick={()=>setDeliveryMethod("home")}
-                            >
-                                <i className="fas fa-truck"></i> Curier
-                            </button>
-                            <button
-                                className={`tab-btn ${deliveryMethod==="easybox"?"active":""}`}
-                                onClick={()=>setDeliveryMethod("easybox")}
-                            >
-                                <i className="fas fa-box"></i> Easybox
-                            </button>
-                        </div>
+                                    <div className="form-group">
+                                        <label>Oraș</label>
+                                        <input type="text" placeholder="Oraș" value={userData.oras} onChange={e=>setUserData({...userData, oras:e.target.value})} />
+                                    </div>
 
-                        {/* Conținut Tab-uri */}
-                        {deliveryMethod === "home" ? (
-                            <div className="address-form animate-fade">
-                                <div className="form-row">
-                                    <input type="text" placeholder="Nume" onChange={e=>setUserData({...userData, nume:e.target.value})} />
-                                    <input type="text" placeholder="Telefon" onChange={e=>setUserData({...userData, telefon:e.target.value})} />
+                                    <div className="form-group">
+                                        <label>Județ</label>
+                                        <input type="text" placeholder="Județ" value={userData.judet} onChange={e=>setUserData({...userData, judet:e.target.value})} />
+                                    </div>
+
+                                    <div className="form-group">
+                                        <label>Adresa completă</label>
+                                        <textarea
+                                            placeholder="Adresa completa (Strada, Nr, Bloc, Scara...)"
+                                            value={userData.adresa}
+                                            onChange={e=>setUserData({...userData, adresa:e.target.value})}
+                                        ></textarea>
+                                    </div>
                                 </div>
-                                <div className="form-row">
-                                    <input type="text" placeholder="Oraș" onChange={e=>setUserData({...userData, oras:e.target.value})} />
-                                    <input type="text" placeholder="Județ" onChange={e=>setUserData({...userData, judet:e.target.value})} />
-                                </div>
-                                <textarea
-                                    placeholder="Adresa completa (Strada, Nr, Bloc, Scara...)"
-                                    onChange={e=>setUserData({...userData, adresa:e.target.value})}
-                                ></textarea>
-                            </div>
-                        ) : (
-                            <div className="easybox-container animate-fade">
-                                <div className="city-search-row">
-                                    <input
-                                        type="text"
-                                        placeholder="Caută oraș (ex: Cluj)..."
-                                        value={citySearch}
-                                        onChange={e=>setCitySearch(e.target.value)}
-                                    />
-                                    <button onClick={handleCitySearch}>Caută</button>
-                                </div>
-                                <div className="map-wrapper" style={{height:300}}>
-                                    <MapContainer center={mapCenter} zoom={13} style={{height:'100%'}}>
-                                        <ChangeView center={mapCenter} />
-                                        <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
-                                        {lockers.map(l => (
-                                            <Marker
-                                                key={l.id}
-                                                position={[l.lat, l.lng]}
-                                                icon={customMarkerIcon}
-                                                eventHandlers={{click: () => handleMarkerClick(l)}}
-                                            >
-                                                <Popup>Click pentru a selecta</Popup>
-                                            </Marker>
-                                        ))}
-                                    </MapContainer>
-                                </div>
-                                {selectedLocker ? (
-                                    <p className="selected-locker-info success">
-                                        📍 Locker Selectat: <strong>{selectedLocker.name}</strong>
-                                    </p>
-                                ) : (
-                                    <p className="selected-locker-info warning">
-                                        ⚠️ Te rugăm să selectezi un Easybox de pe hartă.
-                                    </p>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Metodă Plată */}
-                        <h3 style={{marginTop:'30px', borderTop:'1px solid #eee', paddingTop:'20px'}}>Metodă de plată</h3>
-                        <div className="payment-options">
-                            <label className="checkbox-container">
-                                <input
-                                    type="radio"
-                                    name="payment"
-                                    checked={paymentMethod==="card"}
-                                    onChange={()=>setPaymentMethod("card")}
-                                />
-                                Card Online
-                            </label>
-                            <label className="checkbox-container">
-                                <input
-                                    type="radio"
-                                    name="payment"
-                                    checked={paymentMethod==="cash"}
-                                    onChange={()=>setPaymentMethod("cash")}
-                                />
-                                Ramburs la livrare
-                            </label>
-                        </div>
-
-                        {paymentMethod === "card" && (
-                            <div className="card-form animate-fade" style={{marginTop:'15px'}}>
-                                <input
-                                    type="text"
-                                    placeholder="Număr Card (XXXX XXXX XXXX XXXX)"
-                                    value={cardDetails.number}
-                                    onChange={e=>setCardDetails({...cardDetails, number:e.target.value})}
-                                />
-                                <div className="form-row" style={{marginTop:'10px'}}>
-                                    <input
-                                        type="text"
-                                        placeholder="MM / YY"
-                                        style={{width:'100px'}}
-                                        value={cardDetails.expiry}
-                                        onChange={e=>setCardDetails({...cardDetails, expiry:e.target.value})}
-                                    />
-                                    <input
-                                        type="text"
-                                        placeholder="CVV"
-                                        style={{width:'80px'}}
-                                        value={cardDetails.cvv}
-                                        onChange={e=>setCardDetails({...cardDetails, cvv:e.target.value})}
-                                    />
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-
-                {/* --- SECȚIUNEA DREAPTĂ (Sumar) --- */}
-                <div className="cart-right-section">
-                    <div className="cart-summary sticky-summary">
-                        <h3>Sumar Comandă</h3>
-                        <div className="summary-row">
-                            <span>Produse ({cartItems.length}):</span>
-                            <span>{cartTotal.toFixed(2)} Lei</span>
-                        </div>
-                        <div className="summary-row">
-                            <span>Livrare:</span>
-                            <span>{cartTotal > 200 ? "Gratuit" : "15.00 Lei"}</span>
-                        </div>
-
-                        <div className="summary-row total">
-                            <span>TOTAL:</span>
-                            <span>
-                                {(cartTotal + (cartTotal > 200 ? 0 : 15)).toFixed(2)} Lei
-                            </span>
-                        </div>
-
-                        {/* BUTONUL PRINCIPAL care apelează FACADE-ul */}
-                        <button
-                            className="checkout-btn"
-                            onClick={handleCheckoutClick}
-                            disabled={isProcessing}
-                            style={{ opacity: isProcessing ? 0.7 : 1 }}
-                        >
-                            {isProcessing ? (
-                                <span><i className="fas fa-spinner fa-spin"></i> Se procesează...</span>
                             ) : (
-                                "Trimite Comanda"
+                                <div className="easybox-container animate-fade">
+                                    <div className="city-search-row">
+                                        <input
+                                            type="text"
+                                            placeholder="Caută oraș (ex: Cluj)..."
+                                            value={citySearch}
+                                            onChange={e=>setCitySearch(e.target.value)}
+                                        />
+                                        <button onClick={handleCitySearch}>Caută</button>
+                                    </div>
+                                    <div className="map-wrapper" style={{height:300}}>
+                                        <MapContainer center={mapCenter} zoom={13} style={{height:'100%'}}>
+                                            <ChangeView center={mapCenter} />
+                                            <TileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"/>
+                                            {lockers.map(l => (
+                                                <Marker
+                                                    key={l.id}
+                                                    position={[l.lat, l.lng]}
+                                                    icon={customMarkerIcon}
+                                                    eventHandlers={{click: () => handleMarkerClick(l)}}
+                                                >
+                                                    <Popup>Click pentru a selecta</Popup>
+                                                </Marker>
+                                            ))}
+                                        </MapContainer>
+                                    </div>
+                                    {selectedLocker ? (
+                                        <p className="selected-locker-info success">
+                                            📍 Locker Selectat: <strong>{selectedLocker.name}</strong>
+                                        </p>
+                                    ) : (
+                                        <p className="selected-locker-info warning">
+                                            ⚠️ Te rugăm să selectezi un Easybox de pe hartă.
+                                        </p>
+                                    )}
+                                </div>
                             )}
-                        </button>
-                    </div>
-                </div>
 
+                            {/* Metodă Plată */}
+                            <h3 style={{marginTop:'25px', borderTop:'1px solid #F0B49A', paddingTop:'18px'}}>Metodă de plată</h3>
+                            <div className="payment-options">
+                                <label className="checkbox-container">
+                                    <input
+                                        type="radio"
+                                        name="payment"
+                                        checked={paymentMethod==="card"}
+                                        onChange={()=>setPaymentMethod("card")}
+                                    />
+                                    Card Online
+                                </label>
+                                <label className="checkbox-container">
+                                    <input
+                                        type="radio"
+                                        name="payment"
+                                        checked={paymentMethod==="cash"}
+                                        onChange={()=>setPaymentMethod("cash")}
+                                    />
+                                    Ramburs la livrare
+                                </label>
+                            </div>
+
+                            {paymentMethod === "card" && (
+                                <div className="card-form animate-fade" style={{marginTop:'12px'}}>
+                                    <div className="form-group">
+                                        <label>Număr Card</label>
+                                        <input
+                                            type="text"
+                                            placeholder="XXXX XXXX XXXX XXXX"
+                                            value={cardDetails.number}
+                                            onChange={e=>setCardDetails({...cardDetails, number:e.target.value})}
+                                        />
+                                    </div>
+
+                                    <div className="card-row">
+                                        <div className="form-group" style={{flex: 1}}>
+                                            <label>Data expirării</label>
+                                            <input
+                                                type="text"
+                                                placeholder="MM / YY"
+                                                className="card-expiry"
+                                                value={cardDetails.expiry}
+                                                onChange={e=>setCardDetails({...cardDetails, expiry:e.target.value})}
+                                            />
+                                        </div>
+                                        <div className="form-group" style={{flex: 1}}>
+                                            <label>CVV</label>
+                                            <input
+                                                type="text"
+                                                placeholder="CVV"
+                                                className="card-cvv"
+                                                value={cardDetails.cvv}
+                                                onChange={e=>setCardDetails({...cardDetails, cvv:e.target.value})}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* --- SECȚIUNEA DREAPTĂ (Sumar) --- */}
+                    <div className="cart-right-section">
+                        <div className="cart-summary sticky-summary">
+                            <h3>Sumar Comandă</h3>
+                            <div className="summary-row">
+                                <span>Produse ({cartItems.length}):</span>
+                                <span>{cartTotal.toFixed(2)} Lei</span>
+                            </div>
+                            <div className="summary-row">
+                                <span>Livrare:</span>
+                                <span>{cartTotal > 200 ? "Gratuit" : "15.00 Lei"}</span>
+                            </div>
+
+                            <div className="summary-row total">
+                                <span>TOTAL:</span>
+                                <span>
+                                    {(cartTotal + (cartTotal > 200 ? 0 : 15)).toFixed(2)} Lei
+                                </span>
+                            </div>
+
+                            {/* BUTONUL PRINCIPAL care apelează FACADE-ul */}
+                            <button
+                                className="checkout-btn"
+                                onClick={handleCheckoutClick}
+                                disabled={isProcessing}
+                                style={{ opacity: isProcessing ? 0.7 : 1 }}
+                            >
+                                {isProcessing ? (
+                                    <span><i className="fas fa-spinner fa-spin"></i> Se procesează...</span>
+                                ) : (
+                                    "Trimite Comanda"
+                                )}
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
             </div>
-        </div>
+        </>
     );
 }

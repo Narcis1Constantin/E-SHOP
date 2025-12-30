@@ -45,8 +45,6 @@ export default function AuthPage({ onLoginSuccess }) {
     const apiCall = async (url, bodyData) => {
         showMessage("Se trimite cererea...", "");
 
-        const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
         try {
             const response = await fetch(url, {
                 method: "POST",
@@ -56,7 +54,6 @@ export default function AuthPage({ onLoginSuccess }) {
 
             const result = await response.json();
 
-            await delay(500);
             if (!response.ok) {
                 const errorMsg =
                     result.error ||
@@ -215,6 +212,7 @@ export default function AuthPage({ onLoginSuccess }) {
 
             showMessage("Parolă resetată cu succes!", "success");
 
+            // Mesajul va rămâne vizibil până la schimbarea tab-ului
             setTimeout(() => {
                 setActiveTab("login");
                 setResetStep(1);

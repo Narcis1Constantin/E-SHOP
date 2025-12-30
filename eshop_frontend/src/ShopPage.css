@@ -46,7 +46,9 @@
     color: #fff;
     letter-spacing: -1px;
 }
-.shop-logo span { color: #fda085; }
+.shop-logo span {
+    color: #D2815B;
+}
 
 .search-bar-container {
     flex: 1;

@@ -21,7 +21,7 @@
 .auth-header {
     background-color: #333;
     color: white;
-    padding: 20px 30px;
+    padding: 12px 3px;
     text-align: center;
 }
 
@@ -92,16 +92,79 @@ input:focus { border-color: #fda085; outline: none; background: #fff; }
 
 .submit-btn:hover { opacity: 0.9; }
 
-.message-area {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 8px;
+/* ===== MESAJE AUTH - Design elegant și transparent ===== */
+.auth-message-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 16px;
+}
+
+.auth-message-area {
+    margin: 1px auto;
+    padding: 16px 24px;
+    width: 400px;
+    max-width: 100%;
+    border-radius: 12px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    animation: authSlideIn 0.3s ease;
+}
+
+@keyframes authSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.auth-message-text {
+    width: 100%;
     font-size: 14px;
+    line-height: 1.5;
+    font-weight: 500;
     text-align: center;
 }
 
-.message-area.success { background: #e8ffe8; border: 1px solid #b2ffb2; color: #065f06; }
-.message-area.error { background: #ffe6e6; border: 1px solid #ffb3b3; color: #a00; }
+.auth-message-area.auth-success {
+    background: rgba(232, 255, 232, 0.95);
+    border: 2px solid rgba(76, 175, 80, 0.4);
+    color: #2e7d32;
+    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.15);
+}
+
+.auth-message-area.auth-error {
+    background: rgba(255, 107, 107, 0.15);
+    border: 2px solid rgba(255, 107, 107, 0.3);
+    color: #c62828;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.2);
+}
+
+/* Link resetare parolă din mesajul de eroare */
+.auth-reset-password-link {
+    margin-top: 4px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(198, 40, 40, 0.2);
+    width: 100%;
+    font-size: 13px;
+    font-weight: 600;
+    color: #d32f2f;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.auth-reset-password-link:hover {
+    color: #b71c1c;
+    transform: translateY(-1px);
+}
 
 /* SUBTAB-URI EMAIL / TELEFON – aliniate cu tab-urile de sus */
 .login-subtabs {
@@ -136,4 +199,36 @@ input:focus { border-color: #fda085; outline: none; background: #fff; }
 .login-subtabs button:not(.active):hover {
     background: #ffd3c5;
     border-color: #f79d82;
+}
+
+/* ===== BUTON TOGGLE PASSWORD (OCHIȘOR) ===== */
+.password-toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #999;
+    opacity: 0.6;
+    transition: all 0.2s ease;
+}
+
+.password-toggle-btn:hover {
+    opacity: 1;
+    color: #666;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.password-toggle-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.password-toggle-btn svg {
+    display: block;
 }
