@@ -2,7 +2,9 @@ import React, { useEffect, useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../CartContext";
 import { useUser } from "../UserContext";
+import GustiChatbot from "../components/GustiChatbot";
 import "../ShopPage.css";
+import FinancingModal from '../FinancingModal';
 
 export default function ShopPage({ onLogout }) {
     const navigate = useNavigate();
@@ -15,28 +17,35 @@ export default function ShopPage({ onLogout }) {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // --- STATE FILTRE & SEARCH ---
+    // State filtre & search
     const [searchTerm, setSearchTerm] = useState("");
     const [showFilters, setShowFilters] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("Toate");
     const [priceRange, setPriceRange] = useState({ min: 0, max: 10000 });
     const [onlyDiscount, setOnlyDiscount] = useState(false);
     const [onlyInStock, setOnlyInStock] = useState(false);
+    const [onlyRefurbished, setOnlyRefurbished] = useState(false);
+    const [showFinancingModal, setShowFinancingModal] = useState(false);
 
-    // Calculăm categoriile unice
+    // State pentru Support dropdown și Gusti chatbot
+    const [showSupportDropdown, setShowSupportDropdown] = useState(false);
+    const [showGustiChat, setShowGustiChat] = useState(false);
+
+    // Categorii unice
     const uniqueCategories = useMemo(() => {
-        const cats = allProducts.map(p => p.category).filter(c => c);
+        const cats = allProducts
+            .map(p => p.category?.trim())
+            .filter(c => c);
         return ["Toate", ...new Set(cats)];
     }, [allProducts]);
 
-    // Fetch produse din BAZA TA DE DATE
+    // Fetch produse
     useEffect(() => {
         const fetchProducts = async () => {
             try {
                 setLoading(true);
                 const token = localStorage.getItem('authToken');
 
-                // Luăm produsele din backend-ul tău
                 const res = await fetch('http://localhost:3002/api/products', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
@@ -57,7 +66,7 @@ export default function ShopPage({ onLogout }) {
         fetchProducts();
     }, []);
 
-    // Logica de Filtrare
+    // Filtrare produse
     useEffect(() => {
         if (allProducts.length === 0) return;
         let result = allProducts;
@@ -70,7 +79,6 @@ export default function ShopPage({ onLogout }) {
             result = result.filter(p => p.category === selectedCategory);
         }
 
-        // Convertim price din lei în comparație corectă
         result = result.filter(p => p.price >= priceRange.min && p.price <= priceRange.max);
 
         if (onlyDiscount) {
@@ -79,17 +87,19 @@ export default function ShopPage({ onLogout }) {
         if (onlyInStock) {
             result = result.filter(p => p.stock > 0);
         }
+        if (onlyRefurbished) {
+            result = result.filter(p => p.isRefurbished === true);
+        }
 
         setDisplayedProducts(result);
-    }, [searchTerm, selectedCategory, priceRange, onlyDiscount, onlyInStock, allProducts]);
+    }, [searchTerm, selectedCategory, priceRange, onlyDiscount, onlyInStock, onlyRefurbished, allProducts]);
 
     const userName = user?.name || "Client";
     const userEmail = user?.email || "email@exemplu.com";
 
     return (
         <div className="shop-page-wrapper">
-
-            {/* === HEADER === */}
+            {/* HEADER */}
             <div className="altex-header-container">
                 <div className="header-top">
                     <div className="header-content-width">
@@ -129,7 +139,6 @@ export default function ShopPage({ onLogout }) {
                                             <i className="fas fa-id-card"></i> Date personale
                                         </div>
 
-                                        {/* BUTON ADMIN - vizibil doar pentru admini */}
                                         {isAdmin && (
                                             <div className="menu-item admin-link" onClick={() => navigate("/admin")}>
                                                 <i className="fas fa-cog"></i> Panou Administrator
@@ -175,15 +184,64 @@ export default function ShopPage({ onLogout }) {
                             <i className="fas fa-bars"></i> Produse / Filtre
                         </button>
 
-                        <a href="#" className="nav-item">Promotii</a>
-                        <a href="#" className="nav-item">Resigilate</a>
-                        <div className="nav-item has-dropdown">Finantare <i className="fas fa-chevron-down"></i></div>
-                        <a href="#" className="nav-item">Suport</a>
+                        <button
+                            className="nav-item"
+                            onClick={() => setOnlyDiscount(true)}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                            Promotii
+                        </button>
+
+                        <button
+                            className="nav-item"
+                            onClick={() => setOnlyRefurbished(true)}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                            Resigilate
+                        </button>
+
+                        <button
+                            className="nav-item"
+                            onClick={() => setShowFinancingModal(true)}
+                            style={{ background: 'none', border: 'none', cursor: 'pointer' }}
+                        >
+                            Finantare
+                        </button>
+
+                        {/* SUPPORT DROPDOWN */}
+                        <div
+                            className="support-dropdown-wrapper"
+                            onMouseEnter={() => setShowSupportDropdown(true)}
+                            onMouseLeave={() => setShowSupportDropdown(false)}
+                        >
+                            <button className="nav-item support-btn">
+                                Suport <i className="fas fa-chevron-down"></i>
+                            </button>
+                            {showSupportDropdown && (
+                                <div className="support-dropdown-menu">
+                                    <button
+                                        className="dropdown-item"
+                                        onClick={() => navigate('/contact')}
+                                    >
+                                        <i className="fas fa-envelope"></i> Contact
+                                    </button>
+                                    <button
+                                        className="dropdown-item"
+                                        onClick={() => {
+                                            setShowSupportDropdown(false);
+                                            setShowGustiChat(true);
+                                        }}
+                                    >
+                                        <i className="fas fa-robot"></i> Discută cu Gusti
+                                    </button>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
 
-            {/* === SIDEBAR FILTRE === */}
+            {/* SIDEBAR FILTRE */}
             <div className={`filter-sidebar ${showFilters ? 'open' : ''}`}>
                 <div className="filter-header">
                     <h3>Filtrează Produse</h3>
@@ -201,15 +259,34 @@ export default function ShopPage({ onLogout }) {
                     </div>
 
                     <div className="filter-group">
+                        <label>Preț Minim: {priceRange.min} lei</label>
+                        <input
+                            type="range"
+                            min="0"
+                            max="10000"
+                            step="100"
+                            value={priceRange.min}
+                            onChange={(e) => setPriceRange({ ...priceRange, min: Number(e.target.value) })}
+                        />
+                        <div className="price-labels">
+                            <span>0 lei</span>
+                            <span>10000 lei</span>
+                        </div>
+                    </div>
+
+                    <div className="filter-group">
                         <label>Preț Maxim: {priceRange.max} lei</label>
                         <input
-                            type="range" min="0" max="5000" step="100"
+                            type="range"
+                            min="0"
+                            max="10000"
+                            step="100"
                             value={priceRange.max}
                             onChange={(e) => setPriceRange({ ...priceRange, max: Number(e.target.value) })}
                         />
                         <div className="price-labels">
                             <span>0 lei</span>
-                            <span>5000+ lei</span>
+                            <span>10000 lei</span>
                         </div>
                     </div>
 
@@ -222,6 +299,10 @@ export default function ShopPage({ onLogout }) {
                             <input type="checkbox" checked={onlyInStock} onChange={(e) => setOnlyInStock(e.target.checked)} />
                             Doar produse în stoc
                         </label>
+                        <label className="checkbox-container">
+                            <input type="checkbox" checked={onlyRefurbished} onChange={(e) => setOnlyRefurbished(e.target.checked)} />
+                            Doar produse resigilate
+                        </label>
                     </div>
 
                     <button
@@ -231,6 +312,7 @@ export default function ShopPage({ onLogout }) {
                             setPriceRange({ min: 0, max: 10000 });
                             setOnlyDiscount(false);
                             setOnlyInStock(false);
+                            setOnlyRefurbished(false);
                             setSearchTerm("");
                         }}
                     >
@@ -239,7 +321,7 @@ export default function ShopPage({ onLogout }) {
                 </div>
             </div>
 
-            {/* === CONTENT GRID === */}
+            {/* CONTENT GRID */}
             <main className={`shop-main-content ${showFilters ? 'shifted' : ''}`}>
                 <div className="hero-banner">
                     <h2>Cele mai noi oferte</h2>
@@ -256,7 +338,6 @@ export default function ShopPage({ onLogout }) {
                             className="product-card"
                             style={{ cursor: 'pointer' }}
                         >
-                            {/* Imaginea duce la pagina de detalii */}
                             <div
                                 className="image-container"
                                 onClick={() => navigate(`/product/${product.id}`)}
@@ -272,20 +353,33 @@ export default function ShopPage({ onLogout }) {
                                 {product.discountPercentage > 0 && (
                                     <span className="discount-badge">-{Math.round(product.discountPercentage)}%</span>
                                 )}
+                                {product.isRefurbished && (
+                                    <span className="refurbished-badge">♻️ Resigilat</span>
+                                )}
                             </div>
 
-                            {/* Info produs - și asta duce la detalii */}
                             <div
                                 className="product-info"
                                 onClick={() => navigate(`/product/${product.id}`)}
                             >
                                 <h3>{product.title}</h3>
+
                                 <div className="price-row">
-                                    <span className="price">{Number(product.price).toFixed(2)} Lei</span>
+                                    {product.discountPercentage > 0 ? (
+                                        <div className="price-with-discount">
+                                            <span className="old-price">{Number(product.price).toFixed(2)} Lei</span>
+                                            <span className="price">
+                                                {(product.price * (1 - product.discountPercentage / 100)).toFixed(2)} Lei
+                                            </span>
+                                        </div>
+                                    ) : (
+                                        <span className="price">{Number(product.price).toFixed(2)} Lei</span>
+                                    )}
+
                                     <button
                                         className="add-cart-btn"
                                         onClick={(e) => {
-                                            e.stopPropagation(); // IMPORTANT: oprește propagarea
+                                            e.stopPropagation();
                                             addToCart(product);
                                             alert('Produs adăugat în coș!');
                                         }}
@@ -294,6 +388,7 @@ export default function ShopPage({ onLogout }) {
                                         Adaugă
                                     </button>
                                 </div>
+
                                 <span className={`stock-status ${product.stock === 0 ? 'out-of-stock' : ''}`}>
                                     {product.stock > 0 ? "In stoc" : "Stoc epuizat"}
                                 </span>
@@ -302,6 +397,18 @@ export default function ShopPage({ onLogout }) {
                     ))}
                 </div>
             </main>
+
+            {/* MODALS */}
+            <FinancingModal
+                isOpen={showFinancingModal}
+                onClose={() => setShowFinancingModal(false)}
+                user={user}
+            />
+
+            <GustiChatbot
+                isOpen={showGustiChat}
+                onClose={() => setShowGustiChat(false)}
+            />
         </div>
     );
 }

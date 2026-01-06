@@ -7,7 +7,9 @@ class Product {
         this.brand = builder.brand;
         this.category = builder.category;
         this.imageUrl = builder.imageUrl;
-        this.description = builder.description; // ← NOU
+        this.description = builder.description;
+        this.discountPercentage = builder.discountPercentage || 0;
+        this.isRefurbished = builder.isRefurbished || false; // ← NOU
         this.createdAt = builder.createdAt;
     }
 }

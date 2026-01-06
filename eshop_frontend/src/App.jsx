@@ -7,12 +7,17 @@ import ShopPage from "./pages/ShopPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import MyAccountPage from "./pages/MyAccountPage";
 import CartPage from "./pages/CartPage";
-import ProductDetailsPage from "./pages/ProductDetailsPage"; // ← NOU
+import ProductDetailsPage from "./pages/ProductDetailsPage";
 import ReviewsManagement from "./pages/admin/ReviewsManagement";
-
+import UsersManagement from "./pages/admin/UsersManagement";
+import OrdersManagement from "./pages/admin/OrdersManagement";
+import ReturnsManagement from "./pages/admin/ReturnsManagement";
+import OrderSuccessPage from "./pages/OrderSuccessPage";
+import ContactPage from "./pages/ContactPage.jsx"
 // Pagini Admin
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProductsManagement from "./pages/admin/ProductsManagement";
+import FinancingManagement from "./pages/admin/FinancingManagement";
 
 // Componentă pentru protejarea rutelor admin
 function AdminRoute({ children }) {
@@ -116,7 +121,44 @@ function AppRoutes() {
                 }
             />
 
+            <Route
+                path="/admin/financing"
+                element={
+                    <AdminRoute>
+                        <FinancingManagement />
+                    </AdminRoute>
+                }
+            />
+
+            <Route
+                path="/admin/users"
+                element={
+                    <AdminRoute>
+                        <UsersManagement />
+                    </AdminRoute>
+                }
+            />
+
+            <Route
+                path="/admin/orders"
+                element={
+                    <AdminRoute>
+                        <OrdersManagement />
+                    </AdminRoute>
+                }
+            />
+
+            <Route
+                path="/admin/returns"
+                element={
+                    <AdminRoute>
+                        <ReturnsManagement />
+                    </AdminRoute>
+                }
+            />
+            <Route path="/order-success" element={<OrderSuccessPage />} />
             <Route path="/reset-password" element={<ResetPasswordPage />} />
+            <Route path="/contact" element={<ContactPage />} />
             <Route path="*" element={<Navigate to="/" />} />
         </Routes>
     );
@@ -129,3 +171,5 @@ export default function App() {
         </UserProvider>
     );
 }
+
+

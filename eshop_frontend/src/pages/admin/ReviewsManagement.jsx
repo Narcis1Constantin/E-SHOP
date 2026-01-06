@@ -101,6 +101,10 @@ export default function ReviewsManagement() {
                                 ⭐ Recenzii
                             </Link>
                         </li>
+                        <li><Link to="/admin/financing">💳 Finanțări</Link></li>
+                        <li><Link to="/admin/users">👥 Utilizatori</Link></li>
+                        <li><Link to="/admin/orders">🛒 Comenzi</Link></li>
+                        <li><Link to="/admin/returns">🔄 Retururi</Link></li>
                         <li>
                             <Link to="/">
                                 🏠 Înapoi la magazin

@@ -1,0 +1,253 @@
+/* HEADER */
+.users-header {
+    margin-bottom: 25px;
+}
+
+.users-header h2 {
+    margin: 0;
+    color: #333;
+    font-size: 24px;
+    font-weight: 800;
+}
+
+/* TABLE CONTAINER */
+.users-table-container {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* TABLE */
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.users-table thead {
+    background: linear-gradient(120deg, #333 0%, #555 100%);
+    color: white;
+}
+
+.users-table th {
+    padding: 15px 12px;
+    text-align: left;
+    font-weight: 700;
+    font-size: 13px;
+}
+
+.users-table td {
+    padding: 15px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 13px;
+}
+
+.users-table tbody tr:hover {
+    background: #f9f9f9;
+}
+
+.center-text {
+    text-align: center;
+}
+
+/* ACTION BUTTONS */
+.actions-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-view {
+    border: none;
+    background: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 5px;
+    transition: transform 0.2s;
+}
+
+.btn-view:hover {
+    transform: scale(1.2);
+}
+
+/* STATUS BADGES (identice cu users modal) */
+.status-badge-small {
+    padding: 4px 10px;
+    border-radius: 14px;
+    font-size: 11px;
+    font-weight: 700;
+    display: inline-block;
+    text-transform: capitalize;
+}
+
+/* doar ce folosim */
+.status-badge-small.placed {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge-small.paid {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-badge-small.canceled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+/* STATUS SELECT (dropdown) */
+.orders-status-select {
+    padding: 6px 12px;
+    border-radius: 12px;
+    border: 1px solid #fda085;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: 0.2s;
+}
+
+.orders-status-select:hover {
+    border-color: #ff9966;
+}
+
+/* MODAL – IDENTIC cu Users */
+.modal-content-users {
+    background: white;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header-users {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px;
+    border-bottom: 2px solid #f0f0f0;
+    background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+}
+
+.modal-header-users h3 {
+    margin: 0;
+    color: #333;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.close-modal-btn {
+    background: white;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-body-users {
+    padding: 30px;
+}
+
+/* DETAIL SECTIONS */
+.detail-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.detail-section:last-child {
+    border-bottom: none;
+}
+
+.detail-section h4 {
+    margin: 0 0 15px 0;
+    color: #333;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+/* GRID INFO */
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.detail-grid div {
+    font-size: 14px;
+}
+
+.detail-grid strong {
+    color: #666;
+    font-weight: 600;
+}
+
+/* MINI TABLE (products) */
+.mini-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.mini-table thead {
+    background: #f5f5f5;
+}
+
+.mini-table th {
+    padding: 10px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 13px;
+    color: #666;
+}
+
+.mini-table td {
+    padding: 10px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 13px;
+}
+
+.mini-table tbody tr:hover {
+    background: #fafafa;
+}
+
+/* EMPTY STATES */
+.no-data {
+    text-align: center;
+    color: #999;
+    padding: 20px;
+    font-style: italic;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .users-table {
+        font-size: 12px;
+    }
+
+    .users-table th,
+    .users-table td {
+        padding: 8px;
+    }
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .modal-content-users {
+        width: 100%;
+        max-height: 100vh;
+        border-radius: 0;
+    }
+}

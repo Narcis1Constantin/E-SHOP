@@ -4,15 +4,11 @@ const pool = require('../db/pool');
 // --- 1. COMANDĂ NOUĂ (Foloseste Facade) ---
 exports.placeOrder = async (req, res) => {
     try {
-        // Delegăm întreaga logică complexă (validare, calcul, DB, email) către Facade
+        // Delegăm întreaga logică complexă (validare, calcul, DB, email, Stripe) către Facade
         const result = await CheckoutFacade.placeOrder(req.user, req.body);
 
-        // Returnăm succes către client
-        res.status(201).json({
-            ok: true,
-            orderId: result.orderId,
-            message: "Comanda a fost plasată cu succes!"
-        });
+        // Returnăm TOT ce returnează Facade (inclusiv paymentUrl pentru Stripe!)
+        res.status(201).json(result);
 
     } catch (e) {
         console.error("Eroare în placeOrder Controller:", e);
@@ -32,11 +28,11 @@ exports.listMyOrders = async (req, res) => {
     try {
         console.log('listMyOrders - req.user:', req.user);
 
-        // 1. Obține comenzile utilizatorului
+        // 1. Obține comenzile utilizatorului ✅ ADĂUGAT return_status
         const { rows: orders } = await pool.query(
-            `SELECT id, total_cents, status, address, created_at, payment_ref
-             FROM orders 
-             WHERE user_id = $1 
+            `SELECT id, total_cents, status, address, created_at, payment_ref, return_status
+             FROM orders
+             WHERE user_id = $1
              ORDER BY created_at DESC`,
             [req.user.uid]
         );
@@ -50,13 +46,13 @@ exports.listMyOrders = async (req, res) => {
 
             // Obține produsele comenzii cu JOIN la products pentru nume
             const { rows: items } = await pool.query(
-                `SELECT 
-                    order_items.qty,
-                    order_items.price_cents,
-                    order_items.product_id,
-                    products.title
+                `SELECT
+                     order_items.qty,
+                     order_items.price_cents,
+                     order_items.product_id,
+                     products.title
                  FROM order_items
-                 LEFT JOIN products ON products.id = order_items.product_id
+                          LEFT JOIN products ON products.id = order_items.product_id
                  WHERE order_items.order_id = $1`,
                 [order.id]
             );

@@ -81,16 +81,20 @@ input:focus { border-color: #fda085; outline: none; background: #fff; }
     margin-top: 10px;
     padding: 15px;
     width: 100%;
-    background: linear-gradient(120deg, #333 0%, #555 100%);
+    background: linear-gradient(120deg, #f6d365 0%, #fda085 100%); /* PORTOCALIU GRADIENT */
     color: white;
     border: none;
     border-radius: 8px;
     font-size: 16px;
     font-weight: 700;
     cursor: pointer;
+    transition: all 0.3s;
 }
 
-.submit-btn:hover { opacity: 0.9; }
+.submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(253, 160, 133, 0.4);
+}
 
 /* ===== MESAJE AUTH - Design elegant și transparent ===== */
 .auth-message-wrapper {

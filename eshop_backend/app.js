@@ -2,7 +2,21 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+
+const stripeWebhookController = require('./src/controllers/stripe.webhook.controller');
+
 const app = express();
+
+/**
+ *  STRIPE WEBHOOK – PRIMUL LUCRU DIN APP
+ * FĂRĂ router
+ * FĂRĂ express.json()
+ */
+app.post(
+    '/api/stripe/webhook',
+    express.raw({ type: 'application/json' }),
+    stripeWebhookController.handleStripeWebhook
+);
 
 // Middleware
 app.use(cors({
@@ -40,3 +54,18 @@ const adminReviewsRoutes = require('./src/routes/admin.reviews.routes');
 
 app.use('/api', reviewsRoutes);
 app.use('/api/admin/reviews', adminReviewsRoutes);
+
+const financingRoutes = require('./src/routes/financing.routes');
+app.use('/api/financing', financingRoutes);
+
+const usersRoutes = require('./src/routes/admin.users.routes');
+app.use('/api/admin/users', usersRoutes);
+
+const returnsRoutes = require('./src/routes/returns.routes');
+app.use('/api/returns', returnsRoutes);
+
+const chatRoutes = require('./src/routes/chat.routes');
+app.use('/api/chat', chatRoutes);
+
+const contactRoutes = require('./src/routes/contact.routes');
+app.use('/api/contact', contactRoutes);

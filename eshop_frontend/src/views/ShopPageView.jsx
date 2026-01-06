@@ -139,11 +139,29 @@ export default function ShopPageView({
                     </div>
 
                     <div className="filter-group">
+                        <label>Preț Minim: {priceRange.min} lei</label>
+                        <input
+                            type="range"
+                            min="0"
+                            max="10000"
+                            step="100"
+                            value={priceRange.min}
+                            onChange={(e) =>
+                                setPriceRange({ ...priceRange, min: Number(e.target.value) })
+                            }
+                        />
+                        <div className="price-labels">
+                            <span>0 lei</span>
+                            <span>10000 lei</span>
+                        </div>
+                    </div>
+
+                    <div className="filter-group">
                         <label>Preț Maxim: {priceRange.max} lei</label>
                         <input
                             type="range"
                             min="0"
-                            max="5000"
+                            max="10000"
                             step="100"
                             value={priceRange.max}
                             onChange={(e) =>
@@ -152,7 +170,7 @@ export default function ShopPageView({
                         />
                         <div className="price-labels">
                             <span>0 lei</span>
-                            <span>5000+ lei</span>
+                            <span>10000 lei</span>
                         </div>
                     </div>
 

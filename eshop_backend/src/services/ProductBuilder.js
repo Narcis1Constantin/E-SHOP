@@ -37,8 +37,18 @@ class ProductBuilder {
         return this;
     }
 
-    setDescription(description) { // ← NOU
+    setDescription(description) {
         this.description = description;
+        return this;
+    }
+
+    setDiscountPercentage(discount_percentage) {
+        this.discountPercentage = discount_percentage || 0;
+        return this;
+    }
+
+    setIsRefurbished(is_refurbished) {
+        this.isRefurbished = is_refurbished || false;
         return this;
     }
 

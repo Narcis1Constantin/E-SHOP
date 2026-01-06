@@ -16,7 +16,9 @@ export default function ProductsManagement() {
         brand: '',
         category: '',
         image_url: '',
-        description: '' // ← NOU
+        description: '',
+        discount_percentage: 0,
+        is_refurbished: false // ← NOU
     });
 
     useEffect(() => {
@@ -37,10 +39,10 @@ export default function ProductsManagement() {
     };
 
     const handleInputChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: type === 'checkbox' ? checked : value
         }));
     };
 
@@ -53,7 +55,9 @@ export default function ProductsManagement() {
             brand: '',
             category: '',
             image_url: '',
-            description: '' // ← NOU
+            description: '',
+            discount_percentage: 0,
+            is_refurbished: false // ← NOU
         });
         setShowModal(true);
     };
@@ -68,7 +72,9 @@ export default function ProductsManagement() {
             brand: product.brand || '',
             category: product.category || '',
             image_url: product.imageUrl || '',
-            description: product.description || '' // ← NOU
+            description: product.description || '',
+            discount_percentage: product.discountPercentage || 0,
+            is_refurbished: product.isRefurbished || false // ← NOU
         });
         setShowModal(true);
     };
@@ -167,10 +173,14 @@ export default function ProductsManagement() {
                             </Link>
                         </li>
                         <li>
-                            <Link to="/admin/reviews">  {/* ← NOU */}
+                            <Link to="/admin/reviews">
                                 ⭐ Recenzii
                             </Link>
                         </li>
+                        <li><Link to="/admin/financing">💳 Finanțări</Link></li>
+                        <li><Link to="/admin/users">👥 Utilizatori</Link></li>
+                        <li><Link to="/admin/orders">🛒 Comenzi</Link></li>
+                        <li><Link to="/admin/returns">🔄 Retururi</Link></li>
                         <li>
                             <Link to="/">
                                 🏠 Înapoi la magazin
@@ -198,6 +208,8 @@ export default function ProductsManagement() {
                                     <th>Imagine</th>
                                     <th>Titlu</th>
                                     <th>Preț</th>
+                                    <th>Reducere</th>
+                                    <th>Resigilat</th> {/* ← NOU */}
                                     <th>Stoc</th>
                                     <th>Brand</th>
                                     <th>Categorie</th>
@@ -221,6 +233,25 @@ export default function ProductsManagement() {
                                         </td>
                                         <td>{product.title}</td>
                                         <td>{formatPrice(product.price)}</td>
+                                        <td>
+                                            {product.discountPercentage > 0 ? (
+                                                <span className="discount-badge-admin">
+                                                    -{product.discountPercentage}%
+                                                </span>
+                                            ) : (
+                                                <span style={{ color: '#999' }}>-</span>
+                                            )}
+                                        </td>
+                                        {/* ← NOU: Afișare status resigilat */}
+                                        <td>
+                                            {product.isRefurbished ? (
+                                                <span className="refurbished-badge-admin">
+                                                    ♻️ DA
+                                                </span>
+                                            ) : (
+                                                <span style={{ color: '#999' }}>-</span>
+                                            )}
+                                        </td>
                                         <td>
                                             <span className={product.stock > 0 ? 'stock-available' : 'stock-unavailable'}>
                                                 {product.stock}
@@ -295,6 +326,34 @@ export default function ProductsManagement() {
                                 </div>
                             </div>
 
+                            <div className="form-group">
+                                <label>Reducere (%) 🔥</label>
+                                <input
+                                    type="number"
+                                    name="discount_percentage"
+                                    value={formData.discount_percentage}
+                                    onChange={handleInputChange}
+                                    min="0"
+                                    max="100"
+                                    placeholder="Ex: 20 pentru 20% reducere"
+                                />
+                                <small>Introdu 0 pentru produs fără reducere</small>
+                            </div>
+
+                            {/* ← NOU: Checkbox pentru produs resigilat */}
+                            <div className="form-group">
+                                <label className="checkbox-label-custom">
+                                    <input
+                                        type="checkbox"
+                                        name="is_refurbished"
+                                        checked={formData.is_refurbished}
+                                        onChange={handleInputChange}
+                                    />
+                                    <span>♻️ Produs Resigilat</span>
+                                </label>
+                                <small>Bifează dacă produsul este resigilat/reconditionat</small>
+                            </div>
+
                             <div className="form-row">
                                 <div className="form-group">
                                     <label>Brand</label>
@@ -327,7 +386,6 @@ export default function ProductsManagement() {
                                 />
                             </div>
 
-                            {/* NOU: Câmp pentru descriere */}
                             <div className="form-group">
                                 <label>Descriere</label>
                                 <textarea

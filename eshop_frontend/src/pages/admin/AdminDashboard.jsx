@@ -21,17 +21,20 @@ export default function AdminDashboard() {
         const token = localStorage.getItem('authToken');
 
         try {
-            // Încărcăm statistici de bază
-            const productsRes = await fetch('http://localhost:3002/api/products', {
+            // Încărcăm statistici reale de la backend
+            const statsRes = await fetch('http://localhost:3002/api/admin/users/stats', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
-            const products = await productsRes.json();
+            if (!statsRes.ok) throw new Error('Eroare la încărcarea statisticilor');
+
+            const stats = await statsRes.json();
 
             setStats({
-                totalProducts: products.length || 0,
-                totalOrders: 0, // Poți adăuga endpoint pentru comenzi
-                totalUsers: 0, // Poți adăuga endpoint pentru users
+                totalProducts: stats.totalProducts || 0,
+                totalOrders: stats.totalOrders || 0,
+                totalUsers: stats.totalUsers || 0,
+                totalSales: stats.totalSales || 0,
                 loading: false
             });
         } catch (error) {
@@ -73,10 +76,27 @@ export default function AdminDashboard() {
                             </Link>
                         </li>
                         <li>
-                            <Link to="/admin/reviews">  {/* ← NOU */}
+                            <Link to="/admin/reviews">
                                 ⭐ Recenzii
                             </Link>
                         </li>
+                        <li>
+                            <Link to="/admin/financing">
+                                💳 Finanțări
+                            </Link>
+                        </li>
+                        <li>
+                            <Link to="/admin/users">
+                                👥 Utilizatori
+                            </Link>
+                        </li>
+
+                        <li>
+                            <Link to="/admin/orders">
+                                🛒 Comenzi
+                            </Link>
+                        </li>
+                        <li><Link to="/admin/returns">🔄 Retururi</Link></li>
                         <li>
                             <Link to="/">
                                 🏠 Înapoi la magazin

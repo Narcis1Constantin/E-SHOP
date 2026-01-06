@@ -4,3 +4,42 @@
 /* Doar copiază tot conținutul din AdminDashboard.css aici */
 
 @import './AdminDashboard.css';
+
+/* Badge reducere în tabel */
+.discount-badge-admin {
+    background: #ff4444;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+/* Badge resigilat în tabel */
+.refurbished-badge-admin {
+    background: #ff9800;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.85rem;
+}
+
+/* Checkbox custom în form */
+.checkbox-label-custom {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.checkbox-label-custom input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.checkbox-label-custom span {
+    font-size: 1rem;
+}

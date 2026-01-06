@@ -23,25 +23,41 @@ class OrderService {
                 const pId = parseInt(it.id);
                 const pPrice = it.price ? Math.round(it.price * 100) : 0;
                 const pTitle = it.title || 'Produs Generat';
+                const pQuantity = parseInt(it.quantity) || 1;
+
                 // Asigurăm valori default pentru coloanele obligatorii
                 const pImg = it.thumbnail || it.image_url || '';
                 const pCat = it.category || 'general';
                 const pBrand = it.brand || 'Generic';
 
-                // --- FIX: CREARE PRODUS DACĂ NU EXISTĂ ---
-                try {
-                    // Încercăm să inserăm produsul.
-                    // ON CONFLICT (id) DO NOTHING înseamnă: "Dacă ID-ul e deja luat, nu fă nimic (nu da eroare)"
-                    await client.query(
-                        `INSERT INTO products (id, title, price_cents, stock, category, image_url, brand)
-                         VALUES ($1, $2, $3, $4, $5, $6, $7)
-                         ON CONFLICT (id) DO NOTHING`,
-                        [pId, pTitle, pPrice, 100, pCat, pImg, pBrand]
-                    );
-                    // Dacă ajunge aici, fie l-a inserat, fie exista deja.
-                } catch (prodErr) {
-                    console.error(`[OrderService] ATENȚIE: Nu s-a putut crea produsul ${pId}. Motiv:`, prodErr.message);
-                    // Continuăm execuția. Dacă inserarea a eșuat critic, eroarea de Foreign Key de mai jos ne va opri oricum.
+                // --- VERIFICARE STOC ÎNAINTE DE COMANDĂ ---
+                const stockCheck = await client.query(
+                    `SELECT stock FROM products WHERE id = $1`,
+                    [pId]
+                );
+
+                if (stockCheck.rows.length === 0) {
+                    // Produsul nu există - îl creăm
+                    console.log(`[OrderService] Produs ${pId} nu există, îl cream...`);
+                    try {
+                        await client.query(
+                            `INSERT INTO products (id, title, price_cents, stock, category, image_url, brand)
+                             VALUES ($1, $2, $3, $4, $5, $6, $7)
+                             ON CONFLICT (id) DO NOTHING`,
+                            [pId, pTitle, pPrice, 100, pCat, pImg, pBrand]
+                        );
+                    } catch (prodErr) {
+                        console.error(`[OrderService] ATENȚIE: Nu s-a putut crea produsul ${pId}. Motiv:`, prodErr.message);
+                    }
+                } else {
+                    // Produsul există - verificăm stocul
+                    const currentStock = stockCheck.rows[0].stock;
+
+                    if (currentStock < pQuantity) {
+                        throw new Error(`Stoc insuficient pentru produsul ${pTitle}. Disponibil: ${currentStock}, Solicitat: ${pQuantity}`);
+                    }
+
+                    console.log(`[OrderService] Produs ${pId}: Stoc curent ${currentStock}, Comandă ${pQuantity}`);
                 }
 
                 // 3. Inserare în Order Items
@@ -49,8 +65,29 @@ class OrderService {
                 await client.query(
                     `INSERT INTO order_items(order_id, product_id, qty, price_cents)
                      VALUES ($1, $2, $3, $4)`,
-                    [orderId, pId, it.quantity, pPrice]
+                    [orderId, pId, pQuantity, pPrice]
                 );
+
+                // 4. SCĂDERE AUTOMATĂ DIN STOC
+                const updateResult = await client.query(
+                    `UPDATE products 
+                     SET stock = stock - $1 
+                     WHERE id = $2 
+                     RETURNING stock`,
+                    [pQuantity, pId]
+                );
+
+                if (updateResult.rows.length > 0) {
+                    const newStock = updateResult.rows[0].stock;
+                    console.log(`[OrderService] ✅ Stoc actualizat pentru produsul ${pId}: ${newStock} bucăți rămase`);
+
+                    // Avertizare dacă stocul e scăzut
+                    if (newStock <= 5 && newStock > 0) {
+                        console.log(`⚠️ ATENȚIE: Stoc scăzut pentru produsul ${pId} (${pTitle}): ${newStock} bucăți`);
+                    } else if (newStock === 0) {
+                        console.log(`🚫 Produsul ${pId} (${pTitle}) este EPUIZAT!`);
+                    }
+                }
             }
 
             await client.query('COMMIT');

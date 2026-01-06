@@ -23,6 +23,8 @@ exports.list = async (req, res) => {
             brand,
             category,
             image_url,
+            discount_percentage,
+            is_refurbished,
             created_at
         FROM products
                  ${where}
@@ -32,7 +34,6 @@ exports.list = async (req, res) => {
 
     const { rows } = await pool.query(sql, vals);
 
-   //builder pattern//
     const products = rows.map(row =>
         new ProductBuilder()
             .setId(row.id)
@@ -42,6 +43,8 @@ exports.list = async (req, res) => {
             .setBrand(row.brand)
             .setCategory(row.category)
             .setImageUrl(row.image_url)
+            .setDiscountPercentage(row.discount_percentage)
+            .setIsRefurbished(row.is_refurbished)
             .setCreatedAt(row.created_at)
             .build()
     );
