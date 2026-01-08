@@ -3,7 +3,7 @@ const router = express.Router();
 const usersController = require('../controllers/admin.users.controller');
 const { requireAuth, requireRole } = require('../middleware/auth');
 
-// Toate rutele necesită autentificare admin
+// toate rutele necesita autentificare admin
 router.get('/all', requireAuth, requireRole('admin'), usersController.listAll);
 router.get('/stats', requireAuth, requireRole('admin'), usersController.getStats);
 router.get('/:id', requireAuth, requireRole('admin'), usersController.getById);

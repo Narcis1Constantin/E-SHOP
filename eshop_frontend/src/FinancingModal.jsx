@@ -23,8 +23,6 @@ function FinancingModal({ isOpen, onClose, user }) {
     const calculateFinancing = () => {
         const principal = parseFloat(amount);
         const monthlyInterestRate = (ANNUAL_RATE / 100) / 12;
-
-        // Formula pentru rata lunară cu dobândă
         const monthlyPayment = principal * (monthlyInterestRate * Math.pow(1 + monthlyInterestRate, months)) /
             (Math.pow(1 + monthlyInterestRate, months) - 1);
 
@@ -33,7 +31,6 @@ function FinancingModal({ isOpen, onClose, user }) {
         setMonthlyRate(monthlyPayment);
         setTotalAmount(total);
 
-        // Generează planul de plată lunar
         const plan = [];
         let remainingBalance = principal;
 

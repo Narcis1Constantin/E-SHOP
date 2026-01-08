@@ -25,8 +25,6 @@ export default function AuthPageView({
                                          handleVerifyCode,
                                          handleSetNewPassword,
                                      }) {
-
-    // ✅ Funcție îmbunătățită pentru detectarea erorilor legate de parolă
     const isPasswordError = (text) => {
         if (!text) return false;
 
@@ -53,7 +51,7 @@ export default function AuthPageView({
                         className={activeTab === "login" ? "active" : ""}
                         onClick={() => {
                             setActiveTab("login");
-                            clearMessage(); // Șterge mesajul când schimbăm tab-ul
+                            clearMessage();
                         }}
                         id="tab-login"
                     >
@@ -63,7 +61,7 @@ export default function AuthPageView({
                         className={activeTab === "register" ? "active" : ""}
                         onClick={() => {
                             setActiveTab("register");
-                            clearMessage(); // Șterge mesajul când schimbăm tab-ul
+                            clearMessage();
                         }}
                         id="tab-register"
                     >
@@ -158,13 +156,13 @@ export default function AuthPageView({
                                             title={showPassword ? "Ascunde parola" : "Arată parola"}
                                         >
                                             {showPassword ? (
-                                                // Icon pentru "ascunde parola" (ochi cu linie)
+                                                // ochi cu linie
                                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                     <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
                                                     <line x1="1" y1="1" x2="23" y2="23"></line>
                                                 </svg>
                                             ) : (
-                                                // Icon pentru "arată parola" (ochi deschis)
+                                                // ochi deschis
                                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                                     <circle cx="12" cy="12" r="3"></circle>
@@ -259,13 +257,13 @@ export default function AuthPageView({
                                     title={showPassword ? "Ascunde parola" : "Arată parola"}
                                 >
                                     {showPassword ? (
-                                        // Icon pentru "ascunde parola" (ochi cu linie)
+                                        //ochi cu linie
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                             <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
                                             <line x1="1" y1="1" x2="23" y2="23"></line>
                                         </svg>
                                     ) : (
-                                        // Icon pentru "arată parola" (ochi deschis)
+                                        // ochi deschis
                                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                             <circle cx="12" cy="12" r="3"></circle>
@@ -280,10 +278,10 @@ export default function AuthPageView({
                         </form>
                     )}
 
-                    {/* FORMULAR RESET - 3 PAȘI */}
+                    {/* FORMULAR RESET  */}
                     {activeTab === "reset" && (
                         <>
-                            {/* STEP 1: Introduce email */}
+                            {/* STEP 1: introduce email */}
                             {resetStep === 1 && (
                                 <form id="reset-form-step1" onSubmit={handleResetSubmit}>
                                     <h3>Resetare Parolă</h3>
@@ -309,7 +307,7 @@ export default function AuthPageView({
                                 </form>
                             )}
 
-                            {/* STEP 2: Introduce cod de 6 cifre */}
+                            {/* STEP 2: introduce cod de 6 cifre */}
                             {resetStep === 2 && (
                                 <form id="reset-form-step2" onSubmit={handleVerifyCode}>
                                     <h3 style={{ marginTop: 0, color: "#333" }}>Resetare Parolă</h3>
@@ -354,7 +352,7 @@ export default function AuthPageView({
                                 </form>
                             )}
 
-                            {/* STEP 3: Setează parola nouă */}
+                            {/* STEP 3: seteaza parola noua */}
                             {resetStep === 3 && (
                                 <form id="reset-form-step3" onSubmit={handleSetNewPassword}>
                                     <h3 style={{ marginTop: 0, color: "#333" }}>Resetare Parolă - Pas 3</h3>
@@ -447,7 +445,7 @@ export default function AuthPageView({
                         </>
                     )}
 
-                    {/* MESAJE AUTH - Design elegant */}
+                    {/* MESAJE AUTH */}
                     {message.text && (
                         <div className="auth-message-wrapper">
                             <div
@@ -462,8 +460,6 @@ export default function AuthPageView({
                                 <div className="auth-message-text">
                                     {message.text}
                                 </div>
-
-                                {/* Link resetare parolă - DOAR pentru erori de parolă în LOGIN */}
                                 {message.type === "error" &&
                                     activeTab === "login" &&
                                     isPasswordError(message.text) && (

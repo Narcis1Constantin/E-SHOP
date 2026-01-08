@@ -2,15 +2,14 @@ const pool = require('../db/pool');
 
 /**
  * GUSTI CHATBOT CONTROLLER
- * Integrare cu OpenAI GPT-3.5-turbo pentru asistență clienți
+ * Integrare cu OpenAI GPT-3.5-turbo pentru asistenta clienti
  */
 
-// Configurare OpenAI
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
 /**
- * System prompt pentru Gusti - Contextul și personalitatea bot-ului
+ * system prompt pentru Gusti
  */
 const GUSTI_SYSTEM_PROMPT = `
 Ești Gusti, asistentul virtual prietenos al magazinului SmartDepot - un e-commerce românesc care vinde electronice și electrocasnice.
@@ -53,9 +52,6 @@ REGULI:
 - Fii empatic și înțelegător cu problemele clienților
 `;
 
-/**
- * Handler pentru chat cu Gusti
- */
 exports.chatWithGusti = async (req, res) => {
     const { message, conversationHistory = [] } = req.body;
     const userId = req.user?.uid;
@@ -64,9 +60,8 @@ exports.chatWithGusti = async (req, res) => {
         return res.status(400).json({ error: 'Mesajul nu poate fi gol' });
     }
 
-    // Verificăm dacă avem API key
     if (!OPENAI_API_KEY) {
-        console.error('❌ OPENAI_API_KEY lipsește din .env!');
+        console.error('OPENAI_API_KEY lipsește din .env!');
         return res.status(500).json({
             error: 'Chatbot-ul este temporar indisponibil. Te rugăm să ne contactezi la eshop2025is@gmail.com'
         });
@@ -75,7 +70,6 @@ exports.chatWithGusti = async (req, res) => {
     try {
         console.log(`[Gusti] User ${userId} întreabă: "${message}"`);
 
-        // Obținem informații despre user pentru context
         let userContext = '';
         if (userId) {
             try {
@@ -88,7 +82,7 @@ exports.chatWithGusti = async (req, res) => {
                     userContext = `Utilizatorul se numește ${userData[0].name}.`;
                 }
 
-                // Verificăm dacă are comenzi recente
+                // verificăm daca are comenzi recente
                 const { rows: recentOrders } = await pool.query(
                     `SELECT COUNT(*) as order_count, MAX(created_at) as last_order 
                      FROM orders WHERE user_id = $1`,
@@ -103,7 +97,7 @@ exports.chatWithGusti = async (req, res) => {
             }
         }
 
-        // Construim istoric conversație pentru OpenAI
+        // construim istoric conversație pentru OpenAI
         const messages = [
             {
                 role: 'system',
@@ -119,7 +113,7 @@ exports.chatWithGusti = async (req, res) => {
             }
         ];
 
-        // Apel către OpenAI API
+        // apel catre OpenAI API
         const openaiResponse = await fetch(OPENAI_API_URL, {
             method: 'POST',
             headers: {
@@ -148,7 +142,6 @@ exports.chatWithGusti = async (req, res) => {
 
         console.log(`[Gusti] Răspuns: "${assistantMessage.substring(0, 100)}..."`);
 
-        // Salvăm conversația în DB pentru analytics (opțional)
         try {
             await pool.query(
                 `INSERT INTO chat_logs (user_id, user_message, bot_response, created_at)
@@ -157,7 +150,6 @@ exports.chatWithGusti = async (req, res) => {
             );
         } catch (logErr) {
             console.error('Eroare salvare chat log:', logErr);
-            // Nu blocare răspunsul dacă logging-ul eșuează
         }
 
         res.json({
@@ -173,9 +165,7 @@ exports.chatWithGusti = async (req, res) => {
     }
 };
 
-/**
- * Obține statistici despre utilizarea chatbot-ului (ADMIN)
- */
+
 exports.getChatStats = async (req, res) => {
     try {
         const { rows: stats } = await pool.query(`

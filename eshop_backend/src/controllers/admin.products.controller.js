@@ -1,7 +1,7 @@
 const pool = require('../db/pool');
 const ProductBuilder = require('../services/ProductBuilder');
 
-// GET /api/admin/products - lista toate produsele (pentru admin)
+// lista toate produsele - pentru admin
 exports.list = async (req, res) => {
     try {
         const { rows } = await pool.query(`
@@ -33,7 +33,7 @@ exports.list = async (req, res) => {
     }
 };
 
-// POST /api/admin/products - creare produs nou
+// creare produs nou
 exports.create = async (req, res) => {
     const { title, price_cents, stock = 0, brand, category, image_url, description, discount_percentage = 0, is_refurbished = false } = req.body;
 
@@ -70,7 +70,7 @@ exports.create = async (req, res) => {
     }
 };
 
-// PUT /api/admin/products/:id - actualizare produs
+// actualizare produs
 exports.update = async (req, res) => {
     const { id } = req.params;
     const { title, price_cents, stock, brand, category, image_url, description, discount_percentage, is_refurbished } = req.body;
@@ -117,7 +117,7 @@ exports.update = async (req, res) => {
     }
 };
 
-// DELETE /api/admin/products/:id - ștergere produs
+// ștergere produs
 exports.remove = async (req, res) => {
     const { id } = req.params;
 

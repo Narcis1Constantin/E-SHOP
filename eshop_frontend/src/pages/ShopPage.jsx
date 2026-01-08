@@ -11,13 +11,13 @@ export default function ShopPage({ onLogout }) {
     const { addToCart, cartCount } = useCart();
     const { user, isAdmin } = useUser();
 
-    // State pentru produse
+    // state pentru produse
     const [allProducts, setAllProducts] = useState([]);
     const [displayedProducts, setDisplayedProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    // State filtre & search
+    // state filtre & search
     const [searchTerm, setSearchTerm] = useState("");
     const [showFilters, setShowFilters] = useState(false);
     const [selectedCategory, setSelectedCategory] = useState("Toate");
@@ -27,11 +27,11 @@ export default function ShopPage({ onLogout }) {
     const [onlyRefurbished, setOnlyRefurbished] = useState(false);
     const [showFinancingModal, setShowFinancingModal] = useState(false);
 
-    // State pentru Support dropdown și Gusti chatbot
+    // state pentru Support dropdown și Gusti chatbot
     const [showSupportDropdown, setShowSupportDropdown] = useState(false);
     const [showGustiChat, setShowGustiChat] = useState(false);
 
-    // Categorii unice
+    // categorii unice
     const uniqueCategories = useMemo(() => {
         const cats = allProducts
             .map(p => p.category?.trim())
@@ -39,7 +39,7 @@ export default function ShopPage({ onLogout }) {
         return ["Toate", ...new Set(cats)];
     }, [allProducts]);
 
-    // Fetch produse
+    // fetch produse
     useEffect(() => {
         const fetchProducts = async () => {
             try {
@@ -66,7 +66,7 @@ export default function ShopPage({ onLogout }) {
         fetchProducts();
     }, []);
 
-    // Filtrare produse
+    // filtrare produse
     useEffect(() => {
         if (allProducts.length === 0) return;
         let result = allProducts;

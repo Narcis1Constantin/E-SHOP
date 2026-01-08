@@ -2,7 +2,7 @@ const pool = require('../db/pool');
 const nodemailer = require('nodemailer');
 const PaymentService = require('../services/PaymentService');
 
-// Configurare email transporter
+// configurare email transporter
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
@@ -13,12 +13,11 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-// POST /api/returns - Creare cerere retur (USER)
+// creare cerere retur (USER)
 exports.createReturn = async (req, res) => {
     const userId = req.user.uid;
     const { orderId, reason, details } = req.body;
 
-    // Validare
     if (!orderId || !reason) {
         return res.status(400).json({ error: 'Date incomplete' });
     }
@@ -29,7 +28,6 @@ exports.createReturn = async (req, res) => {
     }
 
     try {
-        // Verifică dacă comanda aparține user-ului
         const { rows: orders } = await pool.query(
             'SELECT * FROM orders WHERE id = $1 AND user_id = $2',
             [orderId, userId]
@@ -42,8 +40,6 @@ exports.createReturn = async (req, res) => {
         }
 
         const order = orders[0];
-
-        // Verifică dacă nu există deja o cerere de retur pentru această comandă
         const { rows: existingReturns } = await pool.query(
             'SELECT * FROM order_returns WHERE order_id = $1',
             [orderId]
@@ -53,7 +49,7 @@ exports.createReturn = async (req, res) => {
             return res.status(400).json({ error: 'Există deja o cerere de retur pentru această comandă' });
         }
 
-        // Creează cererea de retur
+        // creeaza cererea de retur
         const { rows: returns } = await pool.query(
             `INSERT INTO order_returns (order_id, user_id, reason, details, status)
              VALUES ($1, $2, $3, $4, $5)
@@ -61,13 +57,13 @@ exports.createReturn = async (req, res) => {
             [orderId, userId, reason, details, 'pending']
         );
 
-        // Actualizează statusul comenzii
+        // actualizează statusul comenzii
         await pool.query(
             `UPDATE orders SET return_status = $1 WHERE id = $2`,
             ['requested', orderId]
         );
 
-        // Trimite email de confirmare
+        // trimite email de confirmare
         const { rows: users } = await pool.query(
             'SELECT email, name FROM users WHERE id = $1',
             [userId]
@@ -109,7 +105,7 @@ exports.createReturn = async (req, res) => {
     }
 };
 
-// GET /api/returns/my - Retururile utilizatorului curent
+//retururile utilizatorului curent
 exports.getMyReturns = async (req, res) => {
     const userId = req.user.uid;
 
@@ -133,7 +129,7 @@ exports.getMyReturns = async (req, res) => {
     }
 };
 
-// GET /api/admin/returns - Lista toate retururile (ADMIN)
+// lista toate retururile (ADMIN)
 exports.listAll = async (req, res) => {
     try {
         const { rows } = await pool.query(
@@ -156,7 +152,7 @@ exports.listAll = async (req, res) => {
     }
 };
 
-// GET /api/admin/returns/:id - Detalii retur (ADMIN)
+// detalii retur (ADMIN)
 exports.getById = async (req, res) => {
     const { id } = req.params;
 
@@ -182,8 +178,6 @@ exports.getById = async (req, res) => {
         }
 
         const returnData = rows[0];
-
-        // Luăm și produsele din comandă
         const { rows: items } = await pool.query(
             `SELECT oi.qty as quantity, oi.price_cents,
                     ROUND(oi.price_cents / 100.0, 2) as price,
@@ -201,7 +195,7 @@ exports.getById = async (req, res) => {
     }
 };
 
-// PUT /api/admin/returns/:id - Actualizare status retur (ADMIN) + REFUND AUTOMAT
+// actualizare status retur (ADMIN) + REFUND AUTOMAT
 exports.updateStatus = async (req, res) => {
     const { id } = req.params;
     const { status, adminNotes } = req.body;
@@ -212,7 +206,6 @@ exports.updateStatus = async (req, res) => {
     }
 
     try {
-        // 1. Obținem datele returului
         const { rows: returnRows } = await pool.query(
             `SELECT r.*, o.payment_intent_id, o.total_cents
              FROM order_returns r
@@ -228,21 +221,17 @@ exports.updateStatus = async (req, res) => {
         const returnData = returnRows[0];
         const paymentIntentId = returnData.payment_intent_id;
 
-        // 2. Dacă statusul e "approved" și avem payment_intent_id, facem REFUND AUTOMAT
         if (status === 'approved' && paymentIntentId) {
             console.log(`💰 Inițiere refund pentru comanda #${returnData.order_id}, Payment Intent: ${paymentIntentId}`);
 
             try {
-                // Facem refund prin Stripe
                 const refundResult = await PaymentService.createRefund(paymentIntentId, returnData.total_cents);
 
                 console.log(`✅ Refund reușit: ${refundResult.refundId}, Status: ${refundResult.status}`);
 
-                // Dacă refund-ul e successful, schimbăm automat statusul în "completed"
                 if (refundResult.status === 'succeeded') {
                     console.log(`🎉 Refund confirmat! Schimbăm status în "completed"`);
 
-                    // Actualizăm returul la "completed"
                     await pool.query(
                         `UPDATE order_returns 
                          SET status = $1, admin_notes = $2, updated_at = CURRENT_TIMESTAMP
@@ -250,13 +239,11 @@ exports.updateStatus = async (req, res) => {
                         ['completed', adminNotes + `\n\n[Refund automat: ${refundResult.refundId}]`, id]
                     );
 
-                    // Actualizăm și statusul returului în orders
                     await pool.query(
                         `UPDATE orders SET return_status = $1 WHERE id = $2`,
                         ['completed', returnData.order_id]
                     );
 
-                    // Trimitem email de finalizare
                     const { rows: users } = await pool.query(
                         'SELECT email, name FROM users WHERE id = $1',
                         [returnData.user_id]
@@ -290,12 +277,9 @@ exports.updateStatus = async (req, res) => {
 
             } catch (refundError) {
                 console.error('❌ Eroare la refund Stripe:', refundError);
-                // Continuăm cu aprobare manuală dacă refund-ul eșuează
-                // Admin poate finaliza manual mai târziu
             }
         }
 
-        // 3. Dacă NU e "approved" SAU NU are payment_intent_id, update normal
         const { rows, rowCount } = await pool.query(
             `UPDATE order_returns 
              SET status = $1, admin_notes = $2, updated_at = CURRENT_TIMESTAMP
@@ -308,13 +292,11 @@ exports.updateStatus = async (req, res) => {
             return res.status(404).json({ error: 'Retur inexistent' });
         }
 
-        // Actualizăm și statusul returului în orders
         await pool.query(
             `UPDATE orders SET return_status = $1 WHERE id = $2`,
             [status, returnData.order_id]
         );
 
-        // Trimite email către client cu update-ul
         const { rows: users } = await pool.query(
             'SELECT email, name FROM users WHERE id = $1',
             [returnData.user_id]
@@ -351,7 +333,7 @@ exports.updateStatus = async (req, res) => {
     }
 };
 
-// DELETE /api/admin/returns/:id - Ștergere retur (ADMIN)
+// stergere retur (ADMIN)
 exports.deleteReturn = async (req, res) => {
     const { id } = req.params;
 

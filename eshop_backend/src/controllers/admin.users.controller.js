@@ -1,6 +1,6 @@
 const pool = require('../db/pool');
 
-// GET /api/admin/users - Lista toți utilizatorii
+// lista toți utilizatorii
 exports.listAll = async (req, res) => {
     try {
         const { rows } = await pool.query(
@@ -30,7 +30,7 @@ exports.listAll = async (req, res) => {
     }
 };
 
-// GET /api/admin/users/:id - Detalii utilizator specific
+// detalii utilizator specific
 exports.getById = async (req, res) => {
     const { id } = req.params;
 
@@ -48,7 +48,7 @@ exports.getById = async (req, res) => {
 
         const user = users[0];
 
-        // Comenzile utilizatorului
+        // comenzile utilizatorului
         const { rows: orders } = await pool.query(
             `SELECT id, total_cents, status, created_at
              FROM orders WHERE user_id = $1
@@ -56,7 +56,7 @@ exports.getById = async (req, res) => {
             [id]
         );
 
-        // Recenziile utilizatorului
+        // recenziile utilizatorului
         const { rows: reviews } = await pool.query(
             `SELECT r.id, r.rating, r.comment, r.created_at, p.title as product_title
              FROM reviews r
@@ -66,7 +66,7 @@ exports.getById = async (req, res) => {
             [id]
         );
 
-        // Cererile de finanțare
+        // cererile de finantare
         const { rows: financing } = await pool.query(
             `SELECT id, amount, months, status, created_at
              FROM financing_applications WHERE user_id = $1
@@ -86,7 +86,7 @@ exports.getById = async (req, res) => {
     }
 };
 
-// PUT /api/admin/users/:id/role - Actualizare rol utilizator
+// actualizare rol utilizator
 exports.updateRole = async (req, res) => {
     const { id } = req.params;
     const { role } = req.body;
@@ -113,7 +113,7 @@ exports.updateRole = async (req, res) => {
     }
 };
 
-// DELETE /api/admin/users/:id - Ștergere utilizator
+// stergere utilizator
 exports.deleteUser = async (req, res) => {
     const { id } = req.params;
 
@@ -134,22 +134,15 @@ exports.deleteUser = async (req, res) => {
     }
 };
 
-// GET /api/admin/stats - Statistici generale
+// statistici generale
 exports.getStats = async (req, res) => {
     try {
-        // Număr utilizatori
         const { rows: usersCount } = await pool.query('SELECT COUNT(*) as count FROM users');
-
-        // Număr comenzi
         const { rows: ordersCount } = await pool.query('SELECT COUNT(*) as count FROM orders');
-
-        // Total vânzări (în lei)
         const { rows: totalSales } = await pool.query(
             'SELECT COALESCE(SUM(total_cents), 0) as total FROM orders WHERE status != $1',
             ['canceled']
         );
-
-        // Număr produse
         const { rows: productsCount } = await pool.query('SELECT COUNT(*) as count FROM products');
 
         res.json({

@@ -21,7 +21,6 @@ export default function AdminDashboard() {
         const token = localStorage.getItem('authToken');
 
         try {
-            // Încărcăm statistici reale de la backend
             const statsRes = await fetch('http://localhost:3002/api/admin/users/stats', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });

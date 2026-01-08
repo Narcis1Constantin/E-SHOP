@@ -7,11 +7,6 @@ const stripeWebhookController = require('./src/controllers/stripe.webhook.contro
 
 const app = express();
 
-/**
- *  STRIPE WEBHOOK – PRIMUL LUCRU DIN APP
- * FĂRĂ router
- * FĂRĂ express.json()
- */
 app.post(
     '/api/stripe/webhook',
     express.raw({ type: 'application/json' }),

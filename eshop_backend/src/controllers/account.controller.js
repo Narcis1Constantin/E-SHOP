@@ -1,6 +1,5 @@
 const pool = require('../db/pool');
 
-// GET /api/account/me - returnează datele user-ului curent
 exports.getMe = async (req, res) => {
     try {
         const { uid } = req.user;
@@ -15,9 +14,6 @@ exports.getMe = async (req, res) => {
         if (!rows.length) {
             return res.status(404).json({ error: 'Utilizator negăsit' });
         }
-
-        // ✅ FIX: Calculează totalul cheltuit DOAR din comenzi cu status 'placed'
-        // Exclude comenzile anulate, returnate, sau orice alt status
         const { rows: orderTotal } = await pool.query(
             `SELECT COALESCE(SUM(total_cents), 0) as total_spent_cents
              FROM orders
@@ -60,7 +56,7 @@ exports.updateMe = async (req, res) => {
             return res.json({ ok: true, message: 'Parola a fost schimbată cu succes!' });
         }
 
-        // Altfel, actualizează profilul
+        // altfel, actualizează profilul
         const { rows } = await pool.query(
             `UPDATE users 
              SET name = COALESCE($2, name),

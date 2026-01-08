@@ -1,10 +1,6 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const CheckoutFacade = require('../facades/CheckoutFacade');
 
-/**
- * WEBHOOK STRIPE
- * Endpoint special pentru notificări de la Stripe
- */
 exports.handleStripeWebhook = async (req, res) => {
     const sig = req.headers['stripe-signature'];
     const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
@@ -12,58 +8,51 @@ exports.handleStripeWebhook = async (req, res) => {
     let event;
 
     try {
-        // Verificăm semnătura webhook-ului (securitate)
         event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
     } catch (err) {
-        console.error('⚠️ Webhook signature verification failed:', err.message);
+        console.error('Webhook signature verification failed:', err.message);
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
-    console.log(`✅ Webhook primit: ${event.type}`);
+    console.log(`Webhook primit: ${event.type}`);
 
-    // Procesăm evenimentul
     switch (event.type) {
         case 'checkout.session.completed':
             const session = event.data.object;
 
-            // Extragem datele din metadata și session
+            // extragem datele din metadata si session
             const orderId = session.metadata.orderId;
             const email = session.customer_email;
             const customerName = session.customer_details?.name || 'Client';
             const paymentIntentId = session.payment_intent; // ← IMPORTANT: Payment Intent ID
 
-            console.log(`💳 Plată confirmată pentru comanda #${orderId}`);
-            console.log(`💰 Payment Intent ID: ${paymentIntentId}`);
+            console.log(`Plată confirmată pentru comanda #${orderId}`);
+            console.log(`Payment Intent ID: ${paymentIntentId}`);
 
-            // Confirmăm plata prin Facade + salvăm payment_intent_id
+            // confirmam plata prin Facade + salvam payment_intent_id
             try {
                 await CheckoutFacade.confirmPayment(orderId, email, customerName, paymentIntentId);
-                console.log(`✅ Comanda #${orderId} marcată ca plătită`);
+                console.log(`Comanda #${orderId} marcată ca plătită`);
             } catch (error) {
-                console.error(`❌ Eroare procesare webhook pentru comanda #${orderId}:`, error);
+                console.error(`Eroare procesare webhook pentru comanda #${orderId}:`, error);
             }
             break;
 
         case 'payment_intent.succeeded':
-            console.log('💰 Payment Intent succeeded');
+            console.log('Payment Intent succeeded');
             break;
 
         case 'payment_intent.payment_failed':
-            console.log('❌ Payment Intent failed');
+            console.log('Payment Intent failed');
             break;
 
         default:
             console.log(`Eveniment neprocesat: ${event.type}`);
     }
 
-    // Confirmăm primirea webhook-ului către Stripe
     res.json({ received: true });
 };
 
-/**
- * VERIFICARE STATUS PLATĂ
- * Pentru frontend să verifice dacă plata a fost procesată
- */
 exports.checkPaymentStatus = async (req, res) => {
     const { sessionId } = req.params;
 

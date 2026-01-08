@@ -11,9 +11,6 @@ class NotificationService {
         });
     }
 
-    /**
-     * EMAIL SIMPLU (fără factură) - pentru comenzi ramburs
-     */
     async sendOrderConfirmation(email, orderId, total, items, address) {
         const productsList = items.map(i =>
             `<li>${i.title} x${i.quantity} - ${(i.price * i.quantity).toFixed(2)} Lei</li>`
@@ -58,9 +55,7 @@ class NotificationService {
         }
     }
 
-    /**
-     * EMAIL CU FACTURĂ PDF ATAȘATĂ (pentru plăți card)
-     */
+
     async sendOrderConfirmationWithInvoice(email, orderId, total, items, address, invoicePath) {
         const productsList = items.map(i =>
             `<li>${i.title} x${i.quantity} - ${(i.price * i.quantity).toFixed(2)} Lei</li>`
@@ -124,9 +119,6 @@ class NotificationService {
         }
     }
 
-    /**
-     * EMAIL PENTRU UPDATE STATUS RETUR (existent - păstrat)
-     */
     async sendReturnStatusUpdate(email, userName, orderId, status, adminNotes) {
         const statusText = {
             'pending': 'în așteptare',

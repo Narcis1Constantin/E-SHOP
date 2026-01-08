@@ -15,7 +15,6 @@ exports.listAll = async (_req, res) => {
     }
 };
 
-// ✅ NOU: detalii comandă + items (fără crash)
 exports.getById = async (req, res) => {
     try {
         const { id } = req.params;
@@ -30,9 +29,7 @@ exports.getById = async (req, res) => {
 
         if (!rows.length) return res.status(404).json({ error: 'Comandă inexistentă' });
 
-        const order = rows[0];
-
-        // încercăm să luăm produsele; dacă e problemă, nu crăpăm
+        const order = rows[0]
         try {
             const { rows: items } = await pool.query(
                 `SELECT oi.quantity,
@@ -57,7 +54,7 @@ exports.getById = async (req, res) => {
     }
 };
 
-// ✅ DOAR placed / paid
+
 exports.updateStatus = async (req, res) => {
     try {
         const { id } = req.params;
@@ -79,12 +76,10 @@ exports.updateStatus = async (req, res) => {
     }
 };
 
-// ✅ Detalii comandă (VERSIUNEA CORECTATĂ - fără duplicate)
 exports.getById = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // 🔹 Comanda + user
         const { rows } = await pool.query(
             `SELECT o.*, u.email
              FROM orders o
@@ -99,7 +94,6 @@ exports.getById = async (req, res) => {
 
         const order = rows[0];
 
-        // 🔹 Produse comandate (QUERY CORECT PENTRU TABELA TA)
         let items = [];
         try {
             const itemsRes = await pool.query(
@@ -116,7 +110,7 @@ exports.getById = async (req, res) => {
 
             items = itemsRes.rows;
         } catch (err) {
-            console.warn('⚠️ Produsele nu au putut fi încărcate:', err.message);
+            console.warn('Produsele nu au putut fi încărcate:', err.message);
         }
 
         order.items = items;
@@ -124,7 +118,61 @@ exports.getById = async (req, res) => {
         res.json(order);
 
     } catch (err) {
-        console.error('❌ Eroare detalii comandă:', err);
+        console.error('Eroare detalii comandă:', err);
         res.status(500).json({ error: 'Eroare server' });
+    }
+};
+exports.cancelOrder = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.uid;
+        const { rows: orderRows } = await pool.query(
+            `SELECT id, status, user_id 
+             FROM orders 
+             WHERE id = $1`,
+            [id]
+        );
+
+        if (!orderRows.length) {
+            return res.status(404).json({ error: 'Comanda nu a fost găsită' });
+        }
+
+        const order = orderRows[0];
+
+        // verifica ownership - doar proprietarul sau admin pot anula
+        if (order.user_id !== userId) {
+            return res.status(403).json({ error: 'Nu ai permisiunea să anulezi această comandă' });
+        }
+
+        // verifica daca comanda poate fi anulata
+        // doar comenzile 'placed' sau 'paid' pot fi anulate
+        if (![ 'placed'].includes(order.status)) {
+            return res.status(400).json({
+                error: `Nu poți anula această comandă. Status curent: ${order.status}`
+            });
+        }
+
+        // actualizează statusul la 'canceled'
+        const { rowCount } = await pool.query(
+            `UPDATE orders 
+             SET status = 'canceled',
+                 updated_at = CURRENT_TIMESTAMP
+             WHERE id = $1`,
+            [id]
+        );
+
+        if (!rowCount) {
+            return res.status(500).json({ error: 'Eroare la actualizarea comenzii' });
+        }
+
+        res.json({
+            message: 'Comanda a fost anulată cu succes',
+            orderId: id,
+            newStatus: 'canceled'
+        });
+
+    } catch (err) {
+        console.error('Eroare anulare comandă:', err);
+        res.status(500).json({ error: 'Eroare la anularea comenzii' });
     }
 };

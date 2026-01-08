@@ -1,19 +1,10 @@
 import React from "react";
 
 export default function AccountPremium({ user }) {
-    // Pragul pentru Premium (10.000 lei cheltuiți)
     const PREMIUM_THRESHOLD = 10000;
-
-    // Punctele actuale ale userului (vin din backend - 1 leu = 1 punct)
     const currentPoints = user?.points || 0;
-
-    // Verifică dacă are Premium
     const isPremium = currentPoints >= PREMIUM_THRESHOLD;
-
-    // Calculează punctele lipsă
     const pointsNeeded = Math.max(0, PREMIUM_THRESHOLD - currentPoints);
-
-    // Calculează procentul de progres
     const progressPercentage = Math.min(100, (currentPoints / PREMIUM_THRESHOLD) * 100);
 
     return (

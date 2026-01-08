@@ -4,14 +4,9 @@ import "../CartPage.css";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 
-// Importăm Facade-ul (Hook-ul creat anterior)
 import { useShopFacade } from "../hooks/useShopFacade";
-
-// Importăm CSS-ul
 import "../CartPage.css";
 
-// --- CONFIGURARE LEAFLET (Hărți) ---
-// Fix pentru iconițele Leaflet care nu se încarcă corect default în React
 const customMarkerIcon = new L.Icon({
     iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
     iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
@@ -22,7 +17,6 @@ const customMarkerIcon = new L.Icon({
     shadowSize: [41, 41]
 });
 
-// Componentă auxiliară pentru a centra harta când se schimbă coordonatele
 function ChangeView({ center }) {
     const map = useMap();
     map.setView(center, 13);
@@ -31,10 +25,6 @@ function ChangeView({ center }) {
 
 export default function CartPage() {
     const navigate = useNavigate();
-
-    // === 1. FOLOSIM FACADE-UL PENTRU LOGICA DE BUSINESS ===
-    // Componenta nu știe cum se face checkout-ul sau cum se calculează totalul.
-    // Doar primește datele și funcțiile necesare.
     const {
         cartItems,
         cartTotal,
@@ -44,7 +34,6 @@ export default function CartPage() {
         removeFromCart
     } = useShopFacade();
 
-    // === 2. STATE LOCAL (Strict pentru UI / Formulare) ===
     const [userData, setUserData] = useState({
         nume: "",
         email: "",
@@ -58,13 +47,11 @@ export default function CartPage() {
     const [paymentMethod, setPaymentMethod] = useState("card");   // "card" | "cash"
     const [cardDetails, setCardDetails] = useState({ number: "", expiry: "", cvv: "" });
 
-    // === 3. LOGICA PENTRU HARTA EASYBOX (UI ONLY) ===
     const [selectedLocker, setSelectedLocker] = useState(null);
     const [mapCenter, setMapCenter] = useState([44.4268, 26.1025]); // Default: București
     const [citySearch, setCitySearch] = useState("");
     const [lockers, setLockers] = useState([]);
 
-    // Generăm niște lockere fake la încărcare
     useEffect(() => {
         generateMockLockers(44.4268, 26.1025);
     }, []);
@@ -114,14 +101,9 @@ export default function CartPage() {
         }
     };
 
-    // === 4. ACTION HANDLER (DELEGĂ CĂTRE FACADE) ===
     const handleCheckoutClick = () => {
-        // Aici apelăm funcția din Facade.
-        // Componenta nu știe de API, token sau validări complexe.
         processCheckout(userData, deliveryMethod, selectedLocker, paymentMethod);
     };
-
-    // === 5. RANDARE ===
     if (cartItems.length === 0) {
         return (
             <>

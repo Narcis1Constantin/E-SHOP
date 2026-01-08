@@ -5,15 +5,12 @@ html, body {
     margin: 0;
     padding: 0;
     width: 100%;
-    /* Schimbăm height: 100% în min-height pentru a permite creșterea */
     min-height: 100vh;
     background: none;
     font-family: "Roboto", sans-serif;
     -webkit-font-smoothing: antialiased;
-
-    /* IMPORTANT: Asta activează scroll-ul vertical */
     overflow-y: auto;
-    overflow-x: hidden; /* Previne scroll-ul orizontal nedorit */
+    overflow-x: hidden;
 }
 
 * {
@@ -22,5 +19,5 @@ html, body {
 
 #root {
     width: 100%;
-    min-height: 100vh; /* Se asigură că aplicația ocupă tot ecranul */
+    min-height: 100vh;
 }

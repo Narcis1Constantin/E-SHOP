@@ -3,7 +3,7 @@ const router = express.Router();
 const returnsController = require('../controllers/returns.controller');
 const { requireAuth, requireRole } = require('../middleware/auth');
 
-// Rute user (autentificate)
+// Rute user
 router.post('/', requireAuth, returnsController.createReturn);
 router.get('/my', requireAuth, returnsController.getMyReturns);
 

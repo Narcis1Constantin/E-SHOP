@@ -1,11 +1,6 @@
 const nodemailer = require('nodemailer');
 
-/**
- * CONTACT FORM CONTROLLER
- * Trimite mesajele de contact direct pe email
- */
-
-// Configurare email transporter (folosim același ca pentru comenzi)
+// configurare email transporter
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 587,
@@ -16,19 +11,15 @@ const transporter = nodemailer.createTransport({
     }
 });
 
-/**
- * POST /api/contact/send
- * Trimite mesaj de contact
- */
 exports.sendContactMessage = async (req, res) => {
     const { name, email, subject, message } = req.body;
 
-    // Validare
+    // validare
     if (!name || !email || !subject || !message) {
         return res.status(400).json({ error: 'Toate câmpurile sunt obligatorii' });
     }
 
-    // Validare email
+    // validare email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         return res.status(400).json({ error: 'Email invalid' });
@@ -37,11 +28,11 @@ exports.sendContactMessage = async (req, res) => {
     try {
         console.log(`[Contact] Mesaj nou de la ${name} (${email})`);
 
-        // Trimite email către SmartDepot
+        // trimite email căatre SmartDepot
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
-            to: process.env.EMAIL_USER, // Trimite către propriul email
-            replyTo: email, // Pentru a putea răspunde direct
+            to: process.env.EMAIL_USER,
+            replyTo: email, // pentru a putea raspunde direct
             subject: `📩 Contact SmartDepot: ${subject}`,
             html: `
                 <!DOCTYPE html>
@@ -156,7 +147,7 @@ exports.sendContactMessage = async (req, res) => {
             `
         });
 
-        // Trimite email de confirmare către client
+        // trimite email de confirmare catre client
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: email,

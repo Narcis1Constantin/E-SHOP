@@ -20,7 +20,6 @@ export default function OrderSuccessPage() {
             return;
         }
 
-        // Verificăm statusul plății
         const verify = async () => {
             try {
                 const result = await checkPaymentStatus(sessionId);

@@ -1,0 +1,82 @@
+\documentclass[11pt,a4paper]{article}
+
+%biblioteci
+\usepackage[romanian]{babel}  % bibliografia si cuprinsul sa fie in romana
+% \usepackage{times} % times new roman
+\usepackage{csquotes} % pt warning
+\usepackage{lipsum}
+\usepackage{indentfirst} % pentru ca si primul paragraf sa aiba alineat
+\usepackage{graphicx}  % pentru inserare imagini
+\usepackage{float} % pt asezare imagini in pagina
+\usepackage{hyperref} % pt cuprins cu linkuri catre sectiuni
+\usepackage{minted} % pt cod
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+
+\usepackage{biblatex}
+
+% format document(margin)
+\usepackage[top=2.5cm, bottom=2.5cm, left=2.5cm, right=2.5cm]{geometry}
+\linespread{1.06} % spatiu intre cuvinte
+\setlength{\parskip}{8pt plus2pt minus2pt} % spatiu intre paragrafe
+
+% widow and orphan lines
+\widowpenalty 10000
+\clubpenalty 10000
+
+\newcommand{\eat}[1]{}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+
+%puncte si dupa fiecare sectiune in cuprins
+\usepackage{tocloft}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+
+% pentru bibliografie
+% \usepackage{biblatex} % Imports biblatex package
+% \addbibresource{refs.bib} % Import the bibliography file
+\usepackage{amsmath}
+
+% afiseaza mai frumos listele
+\usepackage{enumitem} % ceva control asupra listelor/ enumerarilor
+\setlist{nolistsep,noitemsep}
+
+\setlength{\parskip}{2pt}  % spatiu intre paragrafe
+\usepackage{listings}
+\usepackage{xcolor}
+\lstdefinelanguage{JavaScript}{
+  keywords={class, static, constructor, if, else, switch, case, break, return, new, throw, try, catch, async, await},
+  keywordstyle=\color{blue},
+  ndkeywords={true, false, null},
+  ndkeywordstyle=\color{magenta},
+  identifierstyle=\color{black},
+  sensitive=true,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{gray},
+  stringstyle=\color{green!60!black},
+  morestring=[b]',
+  morestring=[b]"
+}
+
+\lstset{
+  basicstyle=\ttfamily\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{green!60!black},
+  breaklines=true
+}
+
+\begin{document}
+
+\include{text/start_page.tex}
+\tableofcontents % afiseaza cuprinsul
+\include{text/documentatie.tex} % documentatia propriu-zisa
+% \printbibliography  % afisare bibliografie
+
+\end{document} 
+\usepackage{etoolbox}

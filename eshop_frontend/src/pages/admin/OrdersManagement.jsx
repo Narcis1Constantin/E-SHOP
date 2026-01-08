@@ -2,9 +2,8 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useUser } from "../../UserContext";
 
-// 🔥 TRUC: ca să fie 1:1 ca Users, importă CSS-ul de Users
-import "./UsersManagement.css";   // ✅ dacă fișierul e în același folder admin
-import "./OrdersManagement.css";  // doar pentru mici ajustări (opțional)
+import "./UsersManagement.css";
+import "./OrdersManagement.css";
 
 export default function OrdersManagement() {
     const { user, logout } = useUser();
@@ -58,8 +57,6 @@ export default function OrdersManagement() {
             if (!res.ok) throw new Error(body.error || "Eroare la actualizare status");
 
             await fetchOrders();
-
-            // dacă modalul e deschis pe comanda asta, reîncarcăm detaliile
             if (showOrderModal && orderDetails?.id === orderId) {
                 await handleViewOrder(orderId, { silent: true });
             }

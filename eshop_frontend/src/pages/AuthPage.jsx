@@ -212,7 +212,6 @@ export default function AuthPage({ onLoginSuccess }) {
 
             showMessage("Parolă resetată cu succes!", "success");
 
-            // Mesajul va rămâne vizibil până la schimbarea tab-ului
             setTimeout(() => {
                 setActiveTab("login");
                 setResetStep(1);

@@ -3,15 +3,11 @@ const fs = require('fs');
 const path = require('path');
 
 class InvoiceService {
-    /**
-     * Generează o factură PDF pentru o comandă
-     * @param {Object} orderData - Datele comenzii
-     * @returns {String} - Path către fișierul PDF generat
-     */
+    //Genereaza o factură PDF pentru o comanda
+
     async generateInvoice(orderData) {
         const { orderId, customerName, email, address, items, totalCents, createdAt } = orderData;
 
-        // Creăm directorul pentru facturi dacă nu există
         const invoicesDir = path.join(__dirname, '../../invoices');
         if (!fs.existsSync(invoicesDir)) {
             fs.mkdirSync(invoicesDir, { recursive: true });
@@ -22,13 +18,11 @@ class InvoiceService {
 
         return new Promise((resolve, reject) => {
             try {
-                // Creăm documentul PDF
                 const doc = new PDFDocument({ margin: 50 });
                 const stream = fs.createWriteStream(filePath);
 
                 doc.pipe(stream);
 
-                // === HEADER FACTURĂ ===
                 doc
                     .fontSize(20)
                     .fillColor('#FF6B35')
@@ -39,7 +33,7 @@ class InvoiceService {
                     .text('www.smartdepot.ro', 50, 90)
                     .text('contact@smartdepot.ro', 50, 105);
 
-                // Titlu FACTURĂ
+                // Titlu FACTURA
                 doc
                     .fontSize(24)
                     .fillColor('#000000')
@@ -51,14 +45,14 @@ class InvoiceService {
                     .text(`Nr. Comandă: #${orderId}`, 400, 80, { align: 'right' })
                     .text(`Data: ${new Date(createdAt).toLocaleDateString('ro-RO')}`, 400, 95, { align: 'right' });
 
-                // Linie separatoare
+                // linie separatoare
                 doc
                     .moveTo(50, 130)
                     .lineTo(550, 130)
                     .strokeColor('#DDDDDD')
                     .stroke();
 
-                // === DATE CLIENT ===
+                // DATE CLIENT
                 doc
                     .fontSize(12)
                     .fillColor('#000000')
@@ -71,7 +65,7 @@ class InvoiceService {
                     .text(`Email: ${email}`, 50, 185)
                     .text(`Adresă: ${address || '-'}`, 50, 200);
 
-                // === TABEL PRODUSE ===
+                // TABEL PRODUSE
                 const tableTop = 250;
                 const itemHeight = 25;
 
@@ -97,7 +91,6 @@ class InvoiceService {
                     const itemTotal = Number(item.price) * item.quantity;
                     subtotal += itemTotal;
 
-                    // Fundal alternativ pentru rânduri
                     if (index % 2 === 0) {
                         doc
                             .rect(50, yPosition - 5, 500, itemHeight)
@@ -114,8 +107,6 @@ class InvoiceService {
 
                     yPosition += itemHeight;
                 });
-
-                // Linie separatoare înainte de total
                 yPosition += 10;
                 doc
                     .moveTo(50, yPosition)
@@ -123,7 +114,7 @@ class InvoiceService {
                     .strokeColor('#DDDDDD')
                     .stroke();
 
-                // === TOTAL ===
+                // TOTAL
                 yPosition += 20;
                 doc
                     .fontSize(12)
@@ -133,7 +124,7 @@ class InvoiceService {
                     .fillColor('#FF6B35')
                     .text(`${(totalCents / 100).toFixed(2)} Lei`, 480, yPosition, { width: 60, align: 'right' });
 
-                // === FOOTER ===
+                // FOOTER
                 doc
                     .fontSize(8)
                     .fillColor('#999999')
@@ -144,7 +135,6 @@ class InvoiceService {
                         { align: 'center', width: 500 }
                     );
 
-                // Finalizăm documentul
                 doc.end();
 
                 stream.on('finish', () => {
@@ -164,10 +154,7 @@ class InvoiceService {
         });
     }
 
-    /**
-     * Șterge fișierul factură (cleanup după trimitere email)
-     * @param {String} filePath - Path către fișier
-     */
+
     async deleteInvoice(filePath) {
         try {
             if (fs.existsSync(filePath)) {

@@ -1,29 +1,23 @@
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 class PaymentService {
-    /**
-     * Creează o sesiune de plată Stripe Checkout
-     * @param {Object} orderData - Datele comenzii
-     * @returns {Object} - Session URL și Session ID
-     */
     async createCheckoutSession(orderData) {
         const { orderId, email, items, totalCents, successUrl, cancelUrl } = orderData;
 
         try {
-            // Convertim produsele în formatul cerut de Stripe
             const lineItems = items.map(item => ({
                 price_data: {
-                    currency: 'ron', // Lei românești
+                    currency: 'ron',
                     product_data: {
                         name: item.title,
                         description: `Produs #${item.id}`,
                     },
-                    unit_amount: Math.round(item.price * 100), // Convertim în cenți
+                    unit_amount: Math.round(item.price * 100),
                 },
                 quantity: item.quantity,
             }));
 
-            // Creăm sesiunea Stripe Checkout
+
             const session = await stripe.checkout.sessions.create({
                 payment_method_types: ['card'],
                 line_items: lineItems,
@@ -34,7 +28,6 @@ class PaymentService {
                 metadata: {
                     orderId: orderId.toString(),
                 },
-                // Activăm facturarea automată Stripe (opțional)
                 invoice_creation: {
                     enabled: true,
                 },
@@ -53,11 +46,6 @@ class PaymentService {
         }
     }
 
-    /**
-     * Verifică statusul unei sesiuni de plată
-     * @param {String} sessionId - ID-ul sesiunii Stripe
-     * @returns {Object} - Detalii despre plată
-     */
     async getSessionStatus(sessionId) {
         try {
             const session = await stripe.checkout.sessions.retrieve(sessionId);
@@ -75,11 +63,6 @@ class PaymentService {
         }
     }
 
-    /**
-     * Procesează webhook-ul de la Stripe (pentru confirmare plată)
-     * @param {Object} event - Eveniment Stripe
-     * @returns {Object} - Detalii procesare
-     */
     async handleWebhookEvent(event) {
         console.log(`[PaymentService] Webhook primit: ${event.type}`);
 
@@ -112,17 +95,11 @@ class PaymentService {
         return null;
     }
 
-    /**
-     * Creează un refund pentru o comandă returnată
-     * @param {String} paymentIntentId - ID-ul payment intent
-     * @param {Number} amountCents - Suma de rambursat (în cenți)
-     * @returns {Object} - Detalii refund
-     */
     async createRefund(paymentIntentId, amountCents) {
         try {
             const refund = await stripe.refunds.create({
                 payment_intent: paymentIntentId,
-                amount: amountCents, // Suma în cenți
+                amount: amountCents,
             });
 
             console.log(`[PaymentService] Refund creat: ${refund.id} pentru ${amountCents / 100} RON`);

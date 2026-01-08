@@ -4,27 +4,18 @@ const PaymentService = require("../services/PaymentService");
 const InvoiceService = require("../services/InvoiceService");
 
 class CheckoutFacade {
-    /**
-     * VERSIUNEA CU STRIPE
-     * Metoda simplificată pe care o apelează Controller-ul.
-     * Ascunde complexitatea calculelor, tranzacțiilor DB, Stripe și email-ului.
-     */
     async placeOrder(user, orderData) {
         const { address, email, items, paymentMethod } = orderData;
 
-        // 1. Validare Logică (Business Logic)
         if (!items || items.length === 0) {
             throw new Error('Coșul este gol');
         }
 
-        // 2. Calcul Total (Logica de preț)
         let total = 0;
         for (const it of items) {
             total += (Number(it.price) || 0) * it.quantity;
         }
         const totalCents = Math.round(total * 100);
-
-        // 3. Persistență (Order Subsystem)
         const orderId = await OrderService.createOrderTransaction(
             user.uid,
             totalCents,
@@ -34,9 +25,8 @@ class CheckoutFacade {
 
         console.log(`[CheckoutFacade] Comandă #${orderId} creată. Payment method: ${paymentMethod}`);
 
-        // 4. Procesare plată în funcție de metodă
         if (paymentMethod === 'card') {
-            // === PLATĂ CU CARD (STRIPE) ===
+            //PLATA CU CARD
             const paymentResult = await PaymentService.createCheckoutSession({
                 orderId,
                 email,
@@ -47,7 +37,6 @@ class CheckoutFacade {
 
             console.log(`[CheckoutFacade] Sesiune Stripe creată: ${paymentResult.sessionId}`);
 
-            // Returnăm URL-ul de plată Stripe
             return {
                 orderId,
                 total,
@@ -57,8 +46,7 @@ class CheckoutFacade {
             };
 
         } else {
-            // === PLATĂ RAMBURS (CASH ON DELIVERY) ===
-            // Trimitem email de confirmare direct (fără plată online)
+            // PLATA RAMBURS
             await this._sendOrderConfirmationWithInvoice(orderId, email, total, items, address, user.name || 'Client');
 
             return {
@@ -70,15 +58,10 @@ class CheckoutFacade {
         }
     }
 
-    /**
-     * Confirmă plata după ce Stripe notifică webhook-ul
-     * Apelat din webhook controller
-     */
     async confirmPayment(orderId, email, customerName, paymentIntentId) {
         try {
             console.log(`[CheckoutFacade] Confirmare plată pentru comanda #${orderId}`);
 
-            // 1. Actualizăm statusul comenzii în DB + salvăm payment_intent_id
             const pool = require('../db/pool');
             await pool.query(
                 `UPDATE orders SET status = $1, payment_intent_id = $2 WHERE id = $3`,
@@ -87,7 +70,6 @@ class CheckoutFacade {
 
             console.log(`[CheckoutFacade] Payment Intent ID salvat: ${paymentIntentId}`);
 
-            // 2. Obținem detaliile comenzii pentru factură
             const { rows } = await pool.query(
                 `SELECT o.*, u.name
                  FROM orders o
@@ -102,7 +84,6 @@ class CheckoutFacade {
 
             const order = rows[0];
 
-            // 3. Obținem produsele
             const { rows: items } = await pool.query(
                 `SELECT oi.qty as quantity, oi.price_cents, p.title,
                         ROUND(oi.price_cents / 100.0, 2) as price
@@ -112,7 +93,6 @@ class CheckoutFacade {
                 [orderId]
             );
 
-            // 4. Trimitem email cu factură
             await this._sendOrderConfirmationWithInvoice(
                 orderId,
                 email,
@@ -130,13 +110,10 @@ class CheckoutFacade {
         }
     }
 
-    /**
-     * Funcție internă pentru trimitere email + factură PDF
-     * @private
-     */
+
     async _sendOrderConfirmationWithInvoice(orderId, email, total, items, address, customerName) {
         try {
-            // 1. Generăm factura PDF
+            // generam factura PDF
             const invoicePath = await InvoiceService.generateInvoice({
                 orderId,
                 customerName,
@@ -147,7 +124,7 @@ class CheckoutFacade {
                 createdAt: new Date(),
             });
 
-            // 2. Trimitem email cu factura atașată
+            // trimitem email cu factura
             await NotificationService.sendOrderConfirmationWithInvoice(
                 email,
                 orderId,
@@ -157,14 +134,12 @@ class CheckoutFacade {
                 invoicePath
             );
 
-            // 3. Curățăm fișierul PDF după trimitere
             await InvoiceService.deleteInvoice(invoicePath);
 
             console.log(`[CheckoutFacade] Email + factură trimisă pentru comanda #${orderId}`);
 
         } catch (error) {
             console.error('[CheckoutFacade] Eroare trimitere email cu factură:', error);
-            // Nu aruncăm eroare - nu vrem să blocăm procesul dacă emailul eșuează
         }
     }
 }

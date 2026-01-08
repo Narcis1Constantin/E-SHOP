@@ -1,6 +1,6 @@
 const pool = require('../db/pool');
 
-// GET /api/products/:productId/reviews - Toate recenziile unui produs
+// toate recenziile unui produs
 exports.getProductReviews = async (req, res) => {
     const { productId } = req.params;
 
@@ -22,7 +22,7 @@ exports.getProductReviews = async (req, res) => {
     }
 };
 
-// POST /api/products/:productId/reviews - Adaugă recenzie
+// adauga recenzie
 exports.addReview = async (req, res) => {
     const { productId } = req.params;
     const { uid } = req.user; // din middleware requireAuth
@@ -46,7 +46,7 @@ exports.addReview = async (req, res) => {
 
         res.status(201).json({ ok: true, review: rows[0] });
     } catch (err) {
-        if (err.code === '23505') { // Duplicate key
+        if (err.code === '23505') {
             return res.status(409).json({ error: 'Ai lăsat deja o recenzie pentru acest produs' });
         }
         console.error('Eroare la adăugarea recenziei:', err);
@@ -54,7 +54,7 @@ exports.addReview = async (req, res) => {
     }
 };
 
-// DELETE /api/admin/reviews/:reviewId - Șterge recenzie (ADMIN)
+// sterge recenzie (ADMIN)
 exports.deleteReview = async (req, res) => {
     const { reviewId } = req.params;
 

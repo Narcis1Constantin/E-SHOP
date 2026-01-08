@@ -4,7 +4,6 @@ import L from 'leaflet';
 import { useNavigate } from 'react-router-dom';
 import './ContactPage.css';
 
-// Iconiță marker personalizată
 const customIcon = new L.Icon({
     iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
     shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
@@ -23,7 +22,6 @@ const LOCATION = {
 export default function ContactPage() {
     const navigate = useNavigate();
 
-    // State pentru formular
     const [formData, setFormData] = useState({
         name: '',
         email: '',

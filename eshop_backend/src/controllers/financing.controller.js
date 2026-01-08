@@ -1,8 +1,8 @@
 const pool = require('../db/pool');
 
-// POST /api/financing/apply - Trimite cerere de finanțare
+// trimite cerere de finanțare
 exports.applyForFinancing = async (req, res) => {
-    const userId = req.user.id; // Din middleware-ul de autentificare
+    const userId = req.user.id;
     const {
         fullName,
         email,
@@ -16,7 +16,7 @@ exports.applyForFinancing = async (req, res) => {
         interestRate
     } = req.body;
 
-    // Validare
+    // validare
     if (!cnp || !monthlyIncome || !amount || !months) {
         return res.status(400).json({ error: 'Date incomplete' });
     }
@@ -61,7 +61,7 @@ exports.listAll = async (req, res) => {
     }
 };
 
-// GET /api/financing/my-applications - Cererile utilizatorului curent
+// cererile utilizatorului curent
 exports.myApplications = async (req, res) => {
     const userId = req.user.id;
 
@@ -110,7 +110,7 @@ exports.updateStatus = async (req, res) => {
     }
 };
 
-// DELETE /api/admin/financing/:id - Ștergere cerere (ADMIN)
+// stergere cerere (ADMIN)
 exports.deleteApplication = async (req, res) => {
     const { id } = req.params;
 

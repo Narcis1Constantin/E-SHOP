@@ -170,23 +170,22 @@ exports.resetRequest = async (req, res) => {
     );
 
     if (!rows.length) {
-        // Nu dezvăluim dacă emailul există sau nu (securitate)
         return res.json({ ok: true });
     }
 
     const uid = rows[0].id;
 
-    // Generăm cod de 6 cifre
+    // generare cod 6 cifre
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
     const expires = new Date(Date.now() + 15 * 60 * 1000); // 15 minute
 
-    // Stocăm codul în DB
+    // stocam in db
     await pool.query(
         'UPDATE users SET reset_token = $1, reset_token_expires = $2 WHERE id = $3',
         [resetCode, expires, uid]
     );
 
-    // Trimitem email cu codul
+    // trimitem email cu codul
     await transporter.sendMail({
         from: process.env.EMAIL_USER,
         to: email,

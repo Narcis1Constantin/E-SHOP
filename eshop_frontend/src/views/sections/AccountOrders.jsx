@@ -3,21 +3,16 @@ import React, { useState } from "react";
 export default function AccountOrders({ orders }) {
     const [expandedOrderId, setExpandedOrderId] = useState(null);
     const [showReturnModal, setShowReturnModal] = useState(false);
+    const [showCancelModal, setShowCancelModal] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState(null);
     const [returnReason, setReturnReason] = useState('');
     const [returnDetails, setReturnDetails] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // DEBUG - Să vedem ce primim
-    console.log('AccountOrders - orders received:', orders);
-    console.log('AccountOrders - orders length:', orders?.length);
-    console.log('AccountOrders - orders type:', typeof orders);
-
     const toggleOrder = (orderId) => {
         setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
     };
 
-    // Formatare dată
     const formatDate = (dateString) => {
         if (!dateString) return '-';
         const date = new Date(dateString);
@@ -28,7 +23,6 @@ export default function AccountOrders({ orders }) {
         });
     };
 
-    // Traducere status
     const getStatusLabel = (status) => {
         const statusMap = {
             'placed': 'Plasată',
@@ -40,7 +34,6 @@ export default function AccountOrders({ orders }) {
         return statusMap[status] || status;
     };
 
-    // Deschide modal retur
     const handleOpenReturnModal = (order) => {
         setSelectedOrder(order);
         setReturnReason('');
@@ -48,7 +41,6 @@ export default function AccountOrders({ orders }) {
         setShowReturnModal(true);
     };
 
-    // Închide modal retur
     const handleCloseReturnModal = () => {
         setShowReturnModal(false);
         setSelectedOrder(null);
@@ -56,7 +48,16 @@ export default function AccountOrders({ orders }) {
         setReturnDetails('');
     };
 
-    // Trimite cerere retur
+    const handleOpenCancelModal = (order) => {
+        setSelectedOrder(order);
+        setShowCancelModal(true);
+    };
+
+    const handleCloseCancelModal = () => {
+        setShowCancelModal(false);
+        setSelectedOrder(null);
+    };
+
     const handleSubmitReturn = async (e) => {
         e.preventDefault();
 
@@ -90,8 +91,6 @@ export default function AccountOrders({ orders }) {
 
             alert('✅ ' + data.message + '\n\nVei primi un email de confirmare în curând.');
             handleCloseReturnModal();
-
-            // Reîncarcă pagina pentru a actualiza statusul comenzii
             window.location.reload();
 
         } catch (error) {
@@ -102,27 +101,47 @@ export default function AccountOrders({ orders }) {
         }
     };
 
-    // Verifică dacă comanda poate fi returnată
+
     const canReturnOrder = (order) => {
-        // Nu se poate returna dacă:
-        // 1. Comanda NU e plătită (doar comenzile paid pot fi returnate)
         if (order.status !== 'paid') return false;
-
-        // 2. Există deja un retur pentru această comandă
         if (order.return_status) return false;
-
         return true;
     };
 
-    // Traducere motiv retur
-    const getReturnReasonLabel = (reason) => {
-        const reasonMap = {
-            'defect': 'Produs defect',
-            'mismatch': 'Nu corespunde descrierii',
-            'changed_mind': 'Am schimbat decizia',
-            'other': 'Altul'
-        };
-        return reasonMap[reason] || reason;
+
+    const canCancelOrder = (order) => {
+        return ['placed'].includes(order.status);
+    };
+
+    const handleConfirmCancelOrder = async () => {
+        setIsSubmitting(true);
+
+        try {
+            const token = localStorage.getItem('authToken');
+            const response = await fetch(`http://localhost:3002/api/orders/${selectedOrder.id}/cancel`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Eroare la anularea comenzii');
+            }
+
+            alert('✅ Comanda a fost anulată cu succes!');
+            handleCloseCancelModal();
+            window.location.reload();
+
+        } catch (error) {
+            console.error('Eroare:', error);
+            alert('❌ ' + error.message);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (!orders || orders.length === 0) {
@@ -153,7 +172,7 @@ export default function AccountOrders({ orders }) {
                             key={order.id}
                             className={`order-card ${expandedOrderId === order.id ? 'expanded' : ''}`}
                         >
-                            {/* HEADER COMANDĂ - CLICKABLE */}
+                            {/* HEADER COMANDĂ */}
                             <div
                                 className="order-header-clickable"
                                 onClick={() => toggleOrder(order.id)}
@@ -163,7 +182,7 @@ export default function AccountOrders({ orders }) {
                                         Comanda #{order.id}
                                     </h3>
                                     <div className="order-summary">
-                                        <span className="order-status-badge">
+                                        <span className={`order-status-badge status-${order.status}`}>
                                             {getStatusLabel(order.status)}
                                         </span>
                                         <span className="order-price">
@@ -185,9 +204,7 @@ export default function AccountOrders({ orders }) {
 
                                     {/* PRODUSE COMANDATE */}
                                     <div className="details-section">
-                                        <h4>
-                                            <i>📦</i> Produse comandate
-                                        </h4>
+                                        <h4>📦 Produse comandate</h4>
                                         {order.items && order.items.length > 0 ? (
                                             <div className="products-list">
                                                 {order.items.map((item, index) => (
@@ -213,9 +230,7 @@ export default function AccountOrders({ orders }) {
 
                                     {/* DATE LIVRARE */}
                                     <div className="details-section">
-                                        <h4>
-                                            <i>🚚</i> Date livrare
-                                        </h4>
+                                        <h4>🚚 Date livrare</h4>
                                         <div className="delivery-info">
                                             <p>
                                                 <strong>Data comenzii:</strong> {formatDate(order.created_at)}
@@ -231,36 +246,62 @@ export default function AccountOrders({ orders }) {
                                         </div>
                                     </div>
 
-                                    {/* BUTON RETUR */}
-                                    <div className="details-section">
-                                        {canReturnOrder(order) ? (
-                                            <button
-                                                className="btn-return-order"
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    handleOpenReturnModal(order);
-                                                }}
-                                            >
-                                                🔄 Returnează comanda
-                                            </button>
-                                        ) : order.return_status ? (
-                                            <div className="return-status-info">
-                                                <span className={`return-status-badge status-${order.return_status}`}>
-                                                    {order.return_status === 'requested' && '⏳ Retur solicitat'}
-                                                    {order.return_status === 'pending' && '⏳ Retur în așteptare'}
-                                                    {order.return_status === 'approved' && '✅ Retur aprobat'}
-                                                    {order.return_status === 'rejected' && '❌ Retur respins'}
-                                                    {order.return_status === 'completed' && '✔️ Retur finalizat'}
-                                                </span>
-                                                <p className="return-status-text">
-                                                    {order.return_status === 'requested' && 'Cererea de retur este în curs de procesare.'}
-                                                    {order.return_status === 'pending' && 'Cererea de retur este în curs de procesare.'}
-                                                    {order.return_status === 'approved' && 'Returul a fost aprobat! Vei primi instrucțiuni în curând.'}
-                                                    {order.return_status === 'rejected' && 'Returul a fost respins. Verifică email-ul pentru detalii.'}
-                                                    {order.return_status === 'completed' && 'Returul a fost finalizat cu succes!'}
-                                                </p>
+                                    {/* BUTOANE ACȚIUNI SAU STATUS ANULATĂ */}
+                                    <div className="details-section order-actions-section">
+                                        {order.status === 'canceled' ? (
+                                            <div className="canceled-order-message">
+                                                <span className="canceled-icon">❌</span>
+                                                <span className="canceled-text">Comandă anulată</span>
                                             </div>
-                                        ) : null}
+                                        ) : (
+                                            <>
+                                                <div className="order-actions-buttons">
+                                                    {canCancelOrder(order) && (
+                                                        <button
+                                                            className="btn-cancel-order"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleOpenCancelModal(order);
+                                                            }}
+                                                        >
+                                                            Anulează comanda
+                                                        </button>
+                                                    )}
+
+                                                    {canReturnOrder(order) && (
+                                                        <button
+                                                            className="btn-cancel-order"
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleOpenReturnModal(order);
+                                                            }}
+                                                        >
+                                                            🔄 Returnează comanda
+                                                        </button>
+                                                    )}
+                                                </div>
+
+                                                {/* STATUS RETUR */}
+                                                {order.return_status && (
+                                                    <div className="return-status-info">
+                                                        <span className={`return-status-badge status-${order.return_status}`}>
+                                                            {order.return_status === 'requested' && '⏳ Retur solicitat'}
+                                                            {order.return_status === 'pending' && '⏳ Retur în așteptare'}
+                                                            {order.return_status === 'approved' && '✅ Retur aprobat'}
+                                                            {order.return_status === 'rejected' && '❌ Retur respins'}
+                                                            {order.return_status === 'completed' && '✔️ Retur finalizat'}
+                                                        </span>
+                                                        <p className="return-status-text">
+                                                            {order.return_status === 'requested' && 'Cererea de retur este în curs de procesare.'}
+                                                            {order.return_status === 'pending' && 'Cererea de retur este în curs de procesare.'}
+                                                            {order.return_status === 'approved' && 'Returul a fost aprobat! Vei primi instrucțiuni în curând.'}
+                                                            {order.return_status === 'rejected' && 'Returul a fost respins. Verifică email-ul pentru detalii.'}
+                                                            {order.return_status === 'completed' && 'Returul a fost finalizat cu succes!'}
+                                                        </p>
+                                                    </div>
+                                                )}
+                                            </>
+                                        )}
                                     </div>
 
                                 </div>
@@ -269,6 +310,41 @@ export default function AccountOrders({ orders }) {
                     ))}
                 </div>
             </div>
+
+            {/* MODAL ANULARE COMANDĂ */}
+            {showCancelModal && selectedOrder && (
+                <div className="modal-overlay-cancel" onClick={handleCloseCancelModal}>
+                    <div className="modal-content-cancel" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header-cancel">
+                            <span className="warning-icon">⚠️</span>
+                            <h3>Anulare comandă #{selectedOrder.id}</h3>
+                        </div>
+
+                        <div className="modal-body-cancel">
+                            <p className="cancel-question">Sigur vrei să anulezi această comandă?</p>
+                        </div>
+
+                        <div className="modal-actions-cancel">
+                            <button
+                                type="button"
+                                className="btn-no-cancel"
+                                onClick={handleCloseCancelModal}
+                                disabled={isSubmitting}
+                            >
+                                Nu, înapoi
+                            </button>
+                            <button
+                                type="button"
+                                className="btn-yes-cancel"
+                                onClick={handleConfirmCancelOrder}
+                                disabled={isSubmitting}
+                            >
+                                {isSubmitting ? 'Se anulează...' : 'Da, anulează comanda'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* MODAL RETUR */}
             {showReturnModal && selectedOrder && (

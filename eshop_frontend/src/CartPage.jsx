@@ -5,7 +5,6 @@ import L from 'leaflet';
 import { useShopFacade } from "../hooks/useShopFacade";
 import "../CartPage.css";
 
-// Iconiță Leaflet
 const customMarkerIcon = new L.Icon({
     iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
     shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
@@ -44,7 +43,7 @@ export default function CartPage() {
     });
 
     const [deliveryMethod, setDeliveryMethod] = useState("home");
-    const [paymentMethod, setPaymentMethod] = useState("card"); // 'card' sau 'ramburs'
+    const [paymentMethod, setPaymentMethod] = useState("card");
     const [selectedLocker, setSelectedLocker] = useState(null);
     const [mapCenter, setMapCenter] = useState([44.4268, 26.1025]);
     const [lockers, setLockers] = useState([]);
@@ -62,10 +61,8 @@ export default function CartPage() {
 
     const handleCheckout = async () => {
         try {
-            // Delegăm întreaga logică către Facade
             await processCheckout(userData, deliveryMethod, selectedLocker, paymentMethod);
         } catch (err) {
-            // Eroarea e deja afișată de Facade
             console.error('Checkout failed:', err);
         }
     };

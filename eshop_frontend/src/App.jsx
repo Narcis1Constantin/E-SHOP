@@ -1,7 +1,5 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { UserProvider, useUser } from "./UserContext";
-
-// Pagini existente
 import AuthPage from "./pages/AuthPage";
 import ShopPage from "./pages/ShopPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
@@ -19,7 +17,6 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import ProductsManagement from "./pages/admin/ProductsManagement";
 import FinancingManagement from "./pages/admin/FinancingManagement";
 
-// Componentă pentru protejarea rutelor admin
 function AdminRoute({ children }) {
     const { user, loading, isAdmin } = useUser();
 
@@ -37,8 +34,6 @@ function AdminRoute({ children }) {
 
     return children;
 }
-
-// Componentă pentru protejarea rutelor autentificate
 function ProtectedRoute({ children }) {
     const { user, loading } = useUser();
 
