@@ -19,7 +19,7 @@ export default function FinancingManagement() {
     const fetchApplications = async () => {
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch('http://localhost:3002/api/financing/admin/all', {
+            const response = await fetch('https://smartdepot.onrender.com/api/financing/admin/all', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -39,7 +39,7 @@ export default function FinancingManagement() {
         const token = localStorage.getItem('authToken');
 
         try {
-            const response = await fetch(`http://localhost:3002/api/financing/admin/${appId}`, {
+            const response = await fetch(`https://smartdepot.onrender.com/api/financing/admin/${appId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ export default function FinancingManagement() {
         const token = localStorage.getItem('authToken');
 
         try {
-            const response = await fetch(`http://localhost:3002/api/financing/admin/${appId}`, {
+            const response = await fetch(`https://smartdepot.onrender.com/api/financing/admin/${appId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

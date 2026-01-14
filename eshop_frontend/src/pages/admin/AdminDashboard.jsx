@@ -21,7 +21,7 @@ export default function AdminDashboard() {
         const token = localStorage.getItem('authToken');
 
         try {
-            const statsRes = await fetch('http://localhost:3002/api/admin/users/stats', {
+            const statsRes = await fetch('https://smartdepot.onrender.com/api/admin/users/stats', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 

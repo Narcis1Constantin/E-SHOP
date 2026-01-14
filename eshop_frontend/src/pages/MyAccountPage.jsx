@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useUser } from "../UserContext";
 import MyAccountPageView from "../views/MyAccountPageView";
 
-const API_BASE_URL = "http://localhost:3002/api";
+const API_BASE_URL = "https://smartdepot.onrender.com/api";
 
 export default function MyAccountPage() {
     const navigate = useNavigate();

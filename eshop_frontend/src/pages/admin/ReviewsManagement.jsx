@@ -16,7 +16,7 @@ export default function ReviewsManagement() {
 
     const fetchProducts = async () => {
         try {
-            const res = await fetch('http://localhost:3002/api/products');
+            const res = await fetch('https://smartdepot.onrender.com/api/products');
             const data = await res.json();
             setProducts(data);
             setLoading(false);
@@ -28,7 +28,7 @@ export default function ReviewsManagement() {
 
     const fetchReviews = async (productId) => {
         try {
-            const res = await fetch(`http://localhost:3002/api/products/${productId}/reviews`);
+            const res = await fetch(`https://smartdepot.onrender.com/api/products/${productId}/reviews`);
             const data = await res.json();
             setReviews(data);
         } catch (error) {
@@ -47,7 +47,7 @@ export default function ReviewsManagement() {
         const token = localStorage.getItem('authToken');
 
         try {
-            const res = await fetch(`http://localhost:3002/api/admin/reviews/${reviewId}`, {
+            const res = await fetch(`https://smartdepot.onrender.com/api/admin/reviews/${reviewId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -134,7 +134,7 @@ export default function ReviewsManagement() {
                                     }}
                                 >
                                     <img
-                                        src={product.imageUrl || 'https://via.placeholder.com/100'}
+                                        src={product.imageUrl || 'https://placehold.co/100'}
                                         alt={product.title}
                                         style={{ width: '100%', height: '100px', objectFit: 'cover', borderRadius: '4px' }}
                                     />

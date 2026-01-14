@@ -37,7 +37,7 @@ export default function GustiChatbot({ isOpen, onClose }) {
 
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch('http://localhost:3002/api/chat/gusti', {
+            const response = await fetch('https://smartdepot.onrender.com/api/chat/gusti', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

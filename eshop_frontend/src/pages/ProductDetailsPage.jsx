@@ -27,7 +27,7 @@ export default function ProductDetailsPage() {
     const fetchProductDetails = async () => {
         try {
             const token = localStorage.getItem('authToken');
-            const res = await fetch(`http://localhost:3002/api/products`, {
+            const res = await fetch(`https://smartdepot.onrender.com/api/products`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
             const products = await res.json();
@@ -42,7 +42,7 @@ export default function ProductDetailsPage() {
 
     const fetchReviews = async () => {
         try {
-            const res = await fetch(`http://localhost:3002/api/products/${productId}/reviews`);
+            const res = await fetch(`https://smartdepot.onrender.com/api/products/${productId}/reviews`);
             const data = await res.json();
             setReviews(data);
         } catch (error) {
@@ -60,7 +60,7 @@ export default function ProductDetailsPage() {
         }
 
         try {
-            const res = await fetch(`http://localhost:3002/api/products/${productId}/reviews`, {
+            const res = await fetch(`https://smartdepot.onrender.com/api/products/${productId}/reviews`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -92,7 +92,7 @@ export default function ProductDetailsPage() {
         const token = localStorage.getItem('authToken');
 
         try {
-            const res = await fetch(`http://localhost:3002/api/admin/reviews/${reviewId}`, {
+            const res = await fetch(`https://smartdepot.onrender.com/api/admin/reviews/${reviewId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -147,10 +147,10 @@ export default function ProductDetailsPage() {
             <div className="product-container">
                 <div className="product-image-section">
                     <img
-                        src={product.imageUrl || 'https://via.placeholder.com/500x500?text=Fara+imagine'}
+                        src={product.imageUrl || 'https://placehold.co/500x500?text=Fara+imagine'}
                         alt={product.title}
                         onError={(e) => {
-                            e.target.src = 'https://via.placeholder.com/500x500?text=Fara+imagine';
+                            e.target.src = 'https://placehold.co/500x500?text=Fara+imagine';
                         }}
                     />
                 </div>

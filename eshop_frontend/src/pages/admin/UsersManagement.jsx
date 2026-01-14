@@ -18,7 +18,7 @@ export default function UsersManagement() {
     const fetchUsers = async () => {
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch('http://localhost:3002/api/admin/users/all', {
+            const response = await fetch('https://smartdepot.onrender.com/api/admin/users/all', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -37,7 +37,7 @@ export default function UsersManagement() {
     const handleViewDetails = async (userId) => {
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3002/api/admin/users/${userId}`, {
+            const response = await fetch(`https://smartdepot.onrender.com/api/admin/users/${userId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -59,7 +59,7 @@ export default function UsersManagement() {
 
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3002/api/admin/users/${userId}/role`, {
+            const response = await fetch(`https://smartdepot.onrender.com/api/admin/users/${userId}/role`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ export default function UsersManagement() {
 
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3002/api/admin/users/${userId}`, {
+            const response = await fetch(`https://smartdepot.onrender.com/api/admin/users/${userId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

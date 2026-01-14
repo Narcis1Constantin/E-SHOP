@@ -10,7 +10,7 @@ export const useShopFacade = () => {
 
     const _sendOrderToApi = async (orderPayload) => {
         const token = localStorage.getItem("authToken");
-        const response = await fetch("http://localhost:3002/api/orders/place", {
+        const response = await fetch("https://smartdepot.onrender.com/api/orders/place", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -85,7 +85,7 @@ export const useShopFacade = () => {
 
     const checkPaymentStatus = async (sessionId) => {
         try {
-            const response = await fetch(`http://localhost:3002/api/stripe/payment-status/${sessionId}`);
+            const response = await fetch(`https://smartdepot.onrender.com/api/stripe/payment-status/${sessionId}`);
             const result = await response.json();
             return result;
         } catch (err) {

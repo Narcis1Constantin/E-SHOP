@@ -27,7 +27,7 @@ export default function ProductsManagement() {
 
     const fetchProducts = async () => {
         try {
-            const response = await fetch('http://localhost:3002/api/products');
+            const response = await fetch('https://smartdepot.onrender.com/api/products');
             const data = await response.json();
             setProducts(data);
         } catch (error) {
@@ -85,8 +85,8 @@ export default function ProductsManagement() {
 
         try {
             const url = editingProduct
-                ? `http://localhost:3002/api/admin/products/${editingProduct.id}`
-                : 'http://localhost:3002/api/admin/products';
+                ? `https://smartdepot.onrender.com/api/admin/products/${editingProduct.id}`
+                : 'https://smartdepot.onrender.com/api/admin/products';
 
             const method = editingProduct ? 'PUT' : 'POST';
 
@@ -120,7 +120,7 @@ export default function ProductsManagement() {
         const token = localStorage.getItem('authToken');
 
         try {
-            const response = await fetch(`http://localhost:3002/api/admin/products/${productId}`, {
+            const response = await fetch(`https://smartdepot.onrender.com/api/admin/products/${productId}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${token}`

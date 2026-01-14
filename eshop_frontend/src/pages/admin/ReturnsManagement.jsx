@@ -19,7 +19,7 @@ export default function ReturnsManagement() {
     const fetchReturns = async () => {
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch('http://localhost:3002/api/returns/admin/all', {
+            const response = await fetch('https://smartdepot.onrender.com/api/returns/admin/all', {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -38,7 +38,7 @@ export default function ReturnsManagement() {
     const handleViewDetails = async (returnId) => {
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3002/api/returns/admin/${returnId}`, {
+            const response = await fetch(`https://smartdepot.onrender.com/api/returns/admin/${returnId}`, {
                 headers: { 'Authorization': `Bearer ${token}` }
             });
 
@@ -59,7 +59,7 @@ export default function ReturnsManagement() {
 
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3002/api/returns/admin/${selectedReturn.id}`, {
+            const response = await fetch(`https://smartdepot.onrender.com/api/returns/admin/${selectedReturn.id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -84,7 +84,7 @@ export default function ReturnsManagement() {
 
         try {
             const token = localStorage.getItem('authToken');
-            const response = await fetch(`http://localhost:3002/api/returns/admin/${returnId}`, {
+            const response = await fetch(`https://smartdepot.onrender.com/api/returns/admin/${returnId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });

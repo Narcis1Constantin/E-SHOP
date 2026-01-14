@@ -23,7 +23,7 @@ export default function OrdersManagement() {
     const fetchOrders = async () => {
         try {
             const token = localStorage.getItem("authToken");
-            const res = await fetch("http://localhost:3002/api/admin/orders", {
+            const res = await fetch("https://smartdepot.onrender.com/api/admin/orders", {
                 headers: { Authorization: `Bearer ${token}` },
             });
 
@@ -42,7 +42,7 @@ export default function OrdersManagement() {
         try {
             const token = localStorage.getItem("authToken");
             const res = await fetch(
-                `http://localhost:3002/api/admin/orders/${orderId}/status`,
+                `https://smartdepot.onrender.com/api/admin/orders/${orderId}/status`,
                 {
                     method: "PATCH",
                     headers: {
@@ -72,7 +72,7 @@ export default function OrdersManagement() {
             const token = localStorage.getItem("authToken");
 
             const res = await fetch(
-                `http://localhost:3002/api/admin/orders/${orderId}`,
+                `https://smartdepot.onrender.com/api/admin/orders/${orderId}`,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
 

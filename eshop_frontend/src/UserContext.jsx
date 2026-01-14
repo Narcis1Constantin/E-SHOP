@@ -23,7 +23,7 @@ export const UserProvider = ({ children }) => {
         }
 
         try {
-            const response = await fetch('http://localhost:3002/api/account/me', {
+            const response = await fetch('https://smartdepot.onrender.com/api/account/me', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

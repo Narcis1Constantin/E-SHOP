@@ -3,7 +3,7 @@ import { useSearchParams } from "react-router-dom";
 import "../AuthPage.css";
 import ResetPasswordPageView from "../views/ResetPasswordPageView";
 
-const API_BASE_URL = "http://localhost:3002/api";
+const API_BASE_URL = "https://smartdepot.onrender.com/api";
 
 export default function ResetPasswordPage() {
     const [searchParams] = useSearchParams();

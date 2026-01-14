@@ -94,7 +94,7 @@ function FinancingModal({ isOpen, onClose, user }) {
 
             console.log('Trimit datele:', applicationData); // Debug
 
-            const response = await fetch('http://localhost:3002/api/financing/apply', {
+            const response = await fetch('https://smartdepot.onrender.com/api/financing/apply', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

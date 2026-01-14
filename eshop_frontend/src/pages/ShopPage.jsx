@@ -46,7 +46,7 @@ export default function ShopPage({ onLogout }) {
                 setLoading(true);
                 const token = localStorage.getItem('authToken');
 
-                const res = await fetch('http://localhost:3002/api/products', {
+                const res = await fetch('https://smartdepot.onrender.com/api/products', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
 
@@ -344,10 +344,10 @@ export default function ShopPage({ onLogout }) {
                             >
                                 <img
                                     loading="lazy"
-                                    src={product.imageUrl || 'https://via.placeholder.com/300x300?text=Fara+imagine'}
+                                    src={product.imageUrl || 'https://placehold.co/300x300?text=Fara+imagine'}
                                     alt={product.title}
                                     onError={(e) => {
-                                        e.target.src = 'https://via.placeholder.com/300x300?text=Fara+imagine';
+                                        e.target.src = 'https://placehold.co/300x300?text=Fara+imagine';
                                     }}
                                 />
                                 {product.discountPercentage > 0 && (

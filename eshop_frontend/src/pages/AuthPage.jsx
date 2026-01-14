@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "../AuthPage.css";
 import AuthPageView from "../views/AuthPageView";
 
-const API_BASE_URL = "http://localhost:3002/api";
+const API_BASE_URL = "https://smartdepot.onrender.com/api";
 
 export default function AuthPage({ onLoginSuccess }) {
     const [activeTab, setActiveTab] = useState("login");

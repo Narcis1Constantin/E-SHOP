@@ -44,7 +44,7 @@ export default function ContactPage() {
         setSubmitMessage({ type: '', text: '' });
 
         try {
-            const response = await fetch('http://localhost:3002/api/contact/send', {
+            const response = await fetch('https://smartdepot.onrender.com/api/contact/send', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
